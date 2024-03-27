@@ -13,10 +13,12 @@ ROOM_TYPES = (
 
 
 class HotelModel(models.Model):
-    name = models.CharField(null=False, blank=False, max_length=100, unique=True)
-    location = models.CharField(null=False, blank=False, max_length=255, unique=True)
-    description = models.TextField(null=False, blank=False, max_length=2000)
-    rating = models.PositiveSmallIntegerField(null=False, blank=False, verbose_name='Stars',
+    name = models.CharField(max_length=100, unique=True)
+    country = models.CharField(max_length=30, default='')
+    city = models.CharField(max_length=50, default='')
+    location = models.CharField(max_length=255, unique=True)
+    description = models.TextField(max_length=2000)
+    rating = models.PositiveSmallIntegerField(verbose_name='Stars',
                                               validators=[MinValueValidator(1), MaxValueValidator(5)])
     slug = models.SlugField(max_length=255, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -31,7 +33,8 @@ class HotelModel(models.Model):
 class RoomModel(models.Model):
     hotel_id = models.ForeignKey(HotelModel, on_delete=models.CASCADE, verbose_name='Hotel')
     room_type = models.CharField(choices=ROOM_TYPES, max_length=10)
-    number = models.PositiveIntegerField(unique=True)
+    number = models.PositiveIntegerField()
+    description = models.TextField(max_length=1000)
     price_per_night = models.DecimalField(decimal_places=2, max_digits=8)
     available = models.BooleanField(default=True)
     slug = models.SlugField(max_length=255, unique=True)
@@ -41,11 +44,11 @@ class RoomModel(models.Model):
     deleted = models.BooleanField(default=False)
 
     def __str__(self):
-        return f'{self.number} {self.room_type}-room in the {self.hotel_id} hotel'
+        return f'{self.number} {self.room_type}-room in the {self.hotel_id}'
 
 
 class PhotoModel(models.Model):
-    photo_name = models.CharField(max_length=100)
+    photo_name = models.CharField(max_length=100, null=True, blank=True)
     photo = models.ImageField(upload_to='images/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
     hotel_id = models.ForeignKey(HotelModel, on_delete=models.CASCADE, null=True, blank=True,
@@ -65,5 +68,3 @@ class PhotoModel(models.Model):
             return super(PhotoModel, self).clean()
         return super(PhotoModel, self).save(*args, **kwargs)
 
-    def __str__(self):
-        return self.photo_name

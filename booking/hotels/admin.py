@@ -17,12 +17,12 @@ class PhotoInline(admin.StackedInline):
 
 @admin.register(HotelModel)
 class HotelAdmin(admin.ModelAdmin):
-    list_display = ['name', 'rating', 'location', 'description',
+    list_display = ['name', 'rating', 'country', 'city', 'location', 'description',
                     'created_at', 'updated_at', 'deleted_at', 'deleted']
     exclude = ['created_at', 'updated_at', 'deleted_at', 'deleted']
     inlines = [PhotoInline, ]
     ordering = ['name']
-    prepopulated_fields = {'slug': ('rating', 'name',)}
+    prepopulated_fields = {'slug': ('rating', 'name', 'city')}
 
 
 @admin.register(RoomModel)
