@@ -1,0 +1,34 @@
+version: '3.10'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+      POSTGRES_DB: booking
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  booking:
+    build:
+      context: ./booking
+    ports:
+      - '8000:8000'
+    depends_on:
+      - postgres
+    environment:
+      DB_NAME: 'booking'
+      DB_USER: 'postgres'
+      DB_PASSWORD: 'postgres123'
+      DB_HOST: 'postgres'
+      DB_PORT: 5432
+    volumes:
+      - ./booking:/app
+
+volumes:
+  postgres_data:
