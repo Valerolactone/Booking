@@ -1,0 +1,71 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block title %}{{hotel.name}}{% endblock title %}
+
+{% block css %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/certain_item.css' %}" type="text/css">
+{% endblock css %}
+
+{% block header %}{{hotel.rating}} &#11088; {{hotel.name}}{% endblock %}
+
+{% block content %}
+    <div class="info">
+        <p class="user-rating">
+            {% if user_hotel_rating.rating__avg is not None %}
+                Hotel rating is {{user_hotel_rating.rating__avg}} based on {{reviews|length}} review(s).
+            {% else %}
+                This hotel does not yet have a user rating.
+            {% endif %}
+        </p>
+        <p class="hotel-address">{{hotel.country}}, {{hotel.city}}, {{hotel.location}}</p>
+        {% if photos %}
+            <div class="photos">
+                {% for photo in photos %}
+                <a href="/media/{{photo.photo}}"> <img src='/media/{{photo.photo}}'></a>
+                {% endfor %}
+            </div>
+        {% endif%}
+        <p class="description"> {{hotel.description}}</p>
+    </div>
+
+    <div class="rooms">
+        {% if rooms %}
+            <h2>Hotel rooms</h2>
+            {% for room in rooms %}
+                <div class="room">
+                   <a class="room_link" href="/room/{{room.slug}}"> {{room.number}} {{room.room_type}}</a>
+                </div>
+            {% endfor %}
+        {% else %}
+            <h3 class="no-rooms">Sorry, there are no rooms available at this hotel right now.</h3>
+        {% endif %}
+    </div>
+
+    <div class="reviews">
+        {% if reviews %}
+            <h3>Reviews</h3>
+            {% for review in reviews %}
+            <div class="comment">
+                <div class="comment-info">{{review.user_id.username}} | {{review.created_at}}</div>
+                <div class="comment-rating">{{review.rating}} &#11088;</div>
+                <div class="comment-contetnt">{{review.comment}}</div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <h4>There are no reviews for this hotel.</h4>
+        {% endif %}
+        {% if request.user.is_authenticated %}
+        <h4>Leave a review</h4>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="hotel_id" id="id_hotel" value="{{hotel.id}}">
+            <input type="hidden" name="user_id" id="id_user" value="{{request.user.id}}">
+            {{ comment_form.rating}} <br>
+            {{ comment_form.comment}} <br>
+            <input type="submit" value="Publish">
+        </form>
+        {% endif %}
+    </div>
+{% endblock %}

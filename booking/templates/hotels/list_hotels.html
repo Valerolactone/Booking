@@ -1,0 +1,55 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block title %}Hotels{% endblock title %}
+
+{% block header %}Hotels{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/hotels.css' %}" type="text/css">
+{% endblock css %}
+
+{% block content %}
+    <div class="hotels">
+        {% if hotels %}
+            {% for hotel in hotels%}
+            <div class="hotel">
+                <a class="hotel_link" href="/hotel/{{hotel.slug}}">
+                    <h3 class="hotel_name">{{hotel.rating}} &#11088; {{hotel.name}}</h3>
+                    <p class="hotel-address">{{hotel.country}}, {{hotel.city}}, {{hotel.location}}</p>
+                    {% for photo in hotel.photos.all %}
+                        <div class="photos">
+                            <img src='/media/{{photo.photo}}'>
+                        </div>
+                    {% endfor %}
+                </a>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>There are no hotels here.</p>
+        {% endif %}
+    </div>
+
+    {% for contact in page_obj %}
+        {{ contact.full_name|upper }}
+    {% endfor %}
+
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; first</a>
+                <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+            {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+        </span>
+    </div>
+{% endblock %}

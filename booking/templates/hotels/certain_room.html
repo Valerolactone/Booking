@@ -1,0 +1,25 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block title %}{{room.slug}}{% endblock title %}
+
+{% block css %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/certain_item.css' %}" type="text/css">
+{% endblock css %}
+
+{% block header %}{{room.room_type}} room in {{room.hotel_id.rating}} &#11088; {{room.hotel_id.name}}{% endblock %}
+
+{% block content %}
+    <div class="info">
+        <p class="price">{{room.number}} {{room.room_type}} hotel room for {{room.price_per_night}}$ per night</p>
+        {% if photos %}
+            <div class="photos">
+                {% for photo in photos %}
+                <a href="/media/{{photo.photo}}"> <img src='/media/{{photo.photo}}'></a>
+                {% endfor %}
+            </div>
+        {% endif%}
+        <p class="description"> {{room.description}}</p>
+    </div>
+{% endblock %}

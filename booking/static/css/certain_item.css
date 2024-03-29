@@ -1,0 +1,75 @@
+.photos {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    }
+
+img {
+    max-height: 200px;
+    margin: 1px;
+    }
+
+.hotel-address {
+    color: gray;
+    font-family:
+    Brush Script Std,
+    cursive;
+    font-size: 15px;
+    }
+
+.description {
+    font-family: cursive;
+    font-size: 17px;
+    text-align: justify;
+    }
+
+.room a:link, a:visited {
+    font-weight: bold;
+    font-size: 15px;
+    color: white;
+    text-decoration: none;
+    display: inline-block;
+    }
+
+.comment{
+    background: #fff;
+    border: 10px;
+    box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.5);
+    margin: 10px;
+    padding: 5px 25px;
+    }
+
+.comment-info {
+    color: gray;
+    font-family: cursive;
+    font-size: 13px;
+    margin: 2px;
+}
+
+.comment-rating {
+    font-weight: bold;
+    font-size: 15px;
+    margin: 2px;
+    }
+
+.comment-contetnt {
+    font-family: cursive;
+    font-size: 17px;
+    margin: 2px;
+    }
+
+
+.user-rating {
+    color: #3A5199;
+    font-weight: bold;
+    }
+
+.rooms {
+    background: #3A5199;
+    color: white;
+    border: 10px;
+    box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.5);
+    margin: 20px;
+    padding: 5px 25px;
+    }

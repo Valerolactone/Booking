@@ -1,0 +1,33 @@
+<!doctype html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{% block title %}{% endblock %}</title>
+    {% block css %}
+    <link href="{% static 'css/layout.css' %}" rel="stylesheet" type="text/css">
+    {% endblock css %}
+</head>
+<body>
+<header id="page_header">
+    <div id="site_name"> BOOKING</div>
+    <div id="authentication">
+    {% if request.user.is_authenticated %}
+        Welcome, {{user.username}} | <a href="{% url 'logout' %}">Logout</a>
+    {% else %}
+        <a  href="{% url 'login' %}">Login</a> | <a href="{% url 'register' %}">Sign in</a>
+    {% endif %}
+    </div>
+</header>
+    <article id="main_content">
+        <h1>{% block header %}{% endblock %}</h1>
+        {% block content %}{% endblock %}
+    </article>
+    <div id="right_sidebar">{%block right-sidebar %}{% endblock %}</div>
+    <div id="left_sidebar">{%block left-sidebar %}{% endblock %}</div>
+    <footer id="page_footer">This website is a diploma project done by Valeriya Varanchuk in March-April 2024.</footer>
+</body>
+</html>
