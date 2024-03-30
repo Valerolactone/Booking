@@ -23,3 +23,18 @@
         <p class="description"> {{room.description}}</p>
     </div>
 {% endblock %}
+{%block left-sidebar %}
+    {% if room.available %}
+    <div class="reservation">
+        <h4>Make a reservation</h4>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="room_id" id="id_room" value="{{room.id}}">
+            <input type="hidden" name="user_id" id="id_user" value="{{request.user.id}}">
+            <label class="check-date">Check-in: </label> <p>{{ reservation_form.check_in_date}} </p>
+            <label class="check-date">Check-out: </label> <p>{{ reservation_form.check_out_date}} </p>
+            <input type="submit" value="Reserve">
+        </form>
+    </div>
+    {% endif %}
+{% endblock %}
