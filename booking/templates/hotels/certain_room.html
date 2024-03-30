@@ -29,10 +29,12 @@
         <h4>Make a reservation</h4>
         <form method="POST">
             {% csrf_token %}
+            <div class="form-error">{{reservation_form.non_field_errors}}</div>
             <input type="hidden" name="room_id" id="id_room" value="{{room.id}}">
             <input type="hidden" name="user_id" id="id_user" value="{{request.user.id}}">
-            <label class="check-date">Check-in: </label> <p>{{ reservation_form.check_in_date}} </p>
-            <label class="check-date">Check-out: </label> <p>{{ reservation_form.check_out_date}} </p>
+            <input type="hidden" name="cancelled" id="id_cancelled" value="False">
+            <label class="check-date">Check-in: </label> <p>{{ reservation_form.booking_range }} </p>
+            <div class="form-error">{{reservation_form.errors}}</div>
             <input type="submit" value="Reserve">
         </form>
     </div>

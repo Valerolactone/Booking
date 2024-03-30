@@ -1,7 +1,9 @@
+from django.core.exceptions import ValidationError
 from django.db.models import Prefetch, Avg
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
 from django.views.generic import ListView
+from django.db import transaction, DatabaseError
 from .models import HotelModel, RoomModel, PhotoModel
 from reservations.forms import CommentForm, ReservationForm
 from reservations.models import ReviewModel
@@ -48,7 +50,15 @@ class RoomInfoView(View):
                       context={'room': room, 'photos': photos, 'reservation_form': reservation_form})
 
     def post(self, requests, slug):
+        room = get_object_or_404(RoomModel, slug=slug)
         reservation_form = ReservationForm(requests.POST)
-        if reservation_form.is_valid():
-            reservation_form.save()
-            return redirect('room_info', slug=slug)
+        try:
+            with transaction.atomic():
+                if reservation_form.is_valid():
+                    reservation_form.save()
+        except DatabaseError:
+            print('db error')
+        except ValidationError:
+            print('validation error')
+
+        return redirect('room_info', slug=slug)

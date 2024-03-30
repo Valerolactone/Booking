@@ -1,9 +1,11 @@
 from datetime import datetime
-from django.contrib.postgres.forms.ranges import DateRangeField
+
 from django import forms
 from django.core.exceptions import ValidationError
 from django.forms import HiddenInput
-
+from django.forms.fields import DateField
+from django.forms.widgets import DateInput, SelectDateWidget
+from django.contrib.postgres.forms.ranges import DateRangeField
 from .models import ReviewModel, BookingModel
 
 
@@ -19,27 +21,41 @@ class CommentForm(forms.ModelForm):
         }
 
 
+class ReservationDateInput(DateInput):
+    input_type = 'date'
+
+
+class ReservationDateField(DateField):
+    widget = ReservationDateInput
+
+
+class ReservationRangeDateField(DateRangeField):
+    base_field = ReservationDateField
+
+
 class ReservationForm(forms.ModelForm):
+    booking_range = SelectDateWidget(range(1940, 2014))
+
+    class Meta:
+        model = BookingModel
+        fields = ['user_id', 'room_id', 'booking_range', 'cancelled']
+        widgets = {
+            'user_id': HiddenInput(),
+            'room_id': HiddenInput(),
+            'cancelled': HiddenInput(),
+        }
 
     def clean(self):
         cleaned_data = super().clean()
         room_id = cleaned_data.get('room_id')
-        check_in_date = cleaned_data.get('check_in_date')
-        check_out_date = cleaned_data.get('check_out_date')
-
-        if check_in_date < datetime.now():
-            raise ValidationError("The check-in date cannot be in the past.")
-        elif check_out_date < check_in_date:
-            raise ValidationError("The check-out date cannot be earlier than the check-in date.")
+        booking_range = cleaned_data.get('booking_range')
+        all_booked_ranges = BookingModel.objects.filter(room_id=room_id).values('booking_range')
+        print(f'{all_booked_ranges}wefewfewf')
 
         return cleaned_data
 
-    class Meta:
-        model = BookingModel
-        fields = ['user_id', 'room_id', 'check_in_date', 'check_out_date']
-        widgets = {
-            'user_id': HiddenInput(),
-            'room_id': HiddenInput(),
-            'check_in_date': DateRangeField(),
-            'check_out_date': forms.DateInput(attrs={'type': 'date'}),
-        }
+
+"""        if booking_range[0] < datetime.now():
+            raise ValidationError("The check-in date cannot be in the past.")
+        elif booking_range[1] < booking_range[0]:
+            raise ValidationError("The check-out date cannot be earlier than the check-in date.")"""

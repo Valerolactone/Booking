@@ -1,4 +1,7 @@
+from django.contrib.postgres.constraints import ExclusionConstraint
+from django.contrib.postgres.fields import DateRangeField, RangeOperators
 from django.db import models
+from django.db.models import Q
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 
@@ -8,16 +11,27 @@ from hotels.models import RoomModel, HotelModel
 class BookingModel(models.Model):
     user_id = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='User')
     room_id = models.ForeignKey(RoomModel, on_delete=models.CASCADE, verbose_name='Room')
-    check_in_date = models.DateField(null=False, blank=False)
-    check_out_date = models.DateField(null=False, blank=False)
-    slug = models.SlugField(max_length=255, unique=True)
+    booking_range = DateRangeField()
+    cancelled = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True)
     deleted = models.BooleanField(default=False)
 
+    class Meta:
+        constraints = [
+            ExclusionConstraint(
+                name="exclude_overlapping_reservations",
+                expressions=[
+                    ("booking_range", RangeOperators.OVERLAPS),
+                    ("room_id", RangeOperators.EQUAL),
+                ],
+                condition=Q(cancelled=False),
+            ),
+        ]
+
     def __str__(self):
-        return f'Booking {self.room_id} from {self.check_in_date} to {self.check_out_date} by {self.user_id}.'
+        return f'Booking {self.room_id} from {self.booking_range} by {self.user_id}.'
 
 
 class ReviewModel(models.Model):
