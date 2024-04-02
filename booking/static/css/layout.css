@@ -5,7 +5,7 @@ body {
     "right_sidebar article left_sidebar"
     "footer footer footer";
   grid-template-rows: 80px 1fr 70px;
-  grid-template-columns: 15% 1fr 15%;
+  grid-template-columns: 15% 1fr 20%;
   grid-row-gap: 5px;
   grid-column-gap: 15px;
   height: 100vh;
@@ -106,3 +106,63 @@ h1 {
     Brush Script Std,
     cursive;
     }
+
+.form-input {
+    font-size: 16px;
+}
+
+.form-label {
+    min-width: 100px;
+    vertical-align: top;
+    font-weight: bolder;
+    color: #3A5199;
+}
+
+.form-error ul {
+    list-style: none;
+    padding: 0;
+    color: #CC0000;
+}
+
+.button {
+  align-items: center;
+  background-color: #3A5199;
+  border: 2px solid #3A5199;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  fill: #000;
+  font-family: Inter,sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  height: 48px;
+  justify-content: center;
+  letter-spacing: -.8px;
+  line-height: 24px;
+  min-width: 140px;
+  outline: 0;
+  padding: 0 17px;
+  text-align: center;
+  text-decoration: none;
+  transition: all .3s;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.button:focus {
+  color: #171e29;
+}
+
+.button:hover {
+  background-color: #3385ff;
+  border-color: #3385ff;
+  fill: #06f;
+}
+
+.button:active {
+  background-color: #3385ff;
+  border-color: #3385ff;
+  fill: #06f;
+}

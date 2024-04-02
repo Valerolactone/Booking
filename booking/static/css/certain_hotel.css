@@ -32,7 +32,7 @@ img {
     display: inline-block;
     }
 
-.comment{
+.comment {
     background: #fff;
     border: 10px;
     box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.5);
@@ -59,7 +59,6 @@ img {
     margin: 2px;
     }
 
-
 .user-rating {
     color: #3A5199;
     font-weight: bold;
@@ -72,4 +71,26 @@ img {
     box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.5);
     margin: 20px;
     padding: 5px 25px;
+    }
+
+.form-input {
+    margin: 10px;
+    width: 70em;
+    }
+
+@media (min-width: 768px) {
+  .button {
+    width: 40em;
+    margin: 10px;
+  }
+}
+
+.review-form {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    }
+
+.form-label {
+    display: flex;
     }

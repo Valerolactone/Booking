@@ -5,7 +5,7 @@
 
 {% block css %}
     {{ block.super }}
-    <link rel="stylesheet" href="{% static 'css/certain_item.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/certain_hotel.css' %}" type="text/css">
 {% endblock css %}
 
 {% block header %}{{hotel.rating}} &#11088; {{hotel.name}}{% endblock %}
@@ -13,8 +13,8 @@
 {% block content %}
     <div class="info">
         <p class="user-rating">
-            {% if user_hotel_rating.rating__avg is not None %}
-                Hotel rating is {{user_hotel_rating.rating__avg}} based on {{reviews|length}} review(s).
+            {% if user_hotel_rating.avg_rating is not None %}
+                Hotel rating is {{user_hotel_rating.avg_rating}} based on {{reviews|length}} review(s).
             {% else %}
                 This hotel does not yet have a user rating.
             {% endif %}
@@ -31,8 +31,8 @@
     </div>
 
     <div class="rooms">
+        <h2>Hotel rooms</h2>
         {% if rooms %}
-            <h2>Hotel rooms</h2>
             {% for room in rooms %}
                 <div class="room">
                    <a class="room_link" href="/room/{{room.slug}}"> {{room.number}} {{room.room_type}}</a>
@@ -41,6 +41,7 @@
         {% else %}
             <h3 class="no-rooms">Sorry, there are no rooms available at this hotel right now.</h3>
         {% endif %}
+
     </div>
 
     <div class="reviews">
@@ -56,15 +57,16 @@
         {% else %}
             <h4>There are no reviews for this hotel.</h4>
         {% endif %}
-        {% if request.user.is_authenticated %}
-        <h4>Leave a review</h4>
-        <form method="POST">
+        {% if request.user.is_authenticated and request.user.id in users_who_booked and check_out_dates %}
+        <form method="POST" class="review-form">
+            <h3>Share your experiences with others</h3>
             {% csrf_token %}
+            <div class="form-error">{{form.non_field_errors}}</div>
             <input type="hidden" name="hotel_id" id="id_hotel" value="{{hotel.id}}">
             <input type="hidden" name="user_id" id="id_user" value="{{request.user.id}}">
-            {{ comment_form.rating}} <br>
-            {{ comment_form.comment}} <br>
-            <input type="submit" value="Publish">
+            <p><label class="form-label">Rating</label>{{ comment_form.rating}}</p>
+            <p><label class="form-label">Comment</label>{{ comment_form.comment}}</p>
+            <input type="submit" value="Publish" class="button">
         </form>
         {% endif %}
     </div>

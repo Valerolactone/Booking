@@ -1,0 +1,75 @@
+.photos {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    }
+
+img {
+    max-height: 200px;
+    margin: 1px;
+    }
+
+.description {
+    font-family: cursive;
+    font-size: 17px;
+    text-align: justify;
+    }
+
+@media (min-width: 768px) {
+  .button {
+    width: 10em;
+    margin: 10px;
+  }
+}
+
+.reservation-form {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    margin-inline-end: 120px;
+    }
+
+.warning {
+    font-size: 20px;
+    color: red;
+    font-weight: bold;
+    }
+
+.collapsible {
+    background-color: #777;
+    color: white;
+    cursor: pointer;
+    padding: 18px;
+    width: 230px;
+    border: none;
+    text-align: center;
+    outline: none;
+    font-size: 15px;
+    font-weight: bold;
+    }
+
+.active, .collapsible:hover {
+    background-color: #555;
+    }
+
+.unavailable-dates {
+    display: none;
+    width: 230px;
+    font-weight: bold;
+    margin-top: 10px;
+    overflow: hidden;
+    }
+
+.booked_dates {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    }
+
+.booked_dates span {
+    border: 2px solid red;
+    padding: 4px;
+    margin: 2px;
+    border-radius: 5px 5px 5px;
+    }

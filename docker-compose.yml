@@ -14,6 +14,18 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4_container
+    restart: always
+    ports:
+      - "8888:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: postgres@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: pgAdmin123
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+
   booking:
     build:
       context: ./booking
@@ -32,3 +44,4 @@ services:
 
 volumes:
   postgres_data:
+  pgadmin-data:
