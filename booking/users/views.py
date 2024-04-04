@@ -1,9 +1,15 @@
+from datetime import datetime
 from django.contrib.auth import logout, login
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
-from django.shortcuts import redirect
+from django.db import transaction
+from django.shortcuts import redirect, get_object_or_404, render
 from django.urls import reverse_lazy
+from django.views import View
 from django.views.generic import CreateView
-from .forms import RegisterUserForm, LoginUserForm
+from .forms import RegisterUserForm, LoginUserForm, ProfileForm, UserForm
+from .models import Profile, User
+from reservations.models import BookingModel
 
 
 class RegisterUser(CreateView):
@@ -28,3 +34,29 @@ class LoginUser(LoginView):
 def logout_user(request):
     logout(request)
     return redirect('login')
+
+
+class ProfileView(View, LoginRequiredMixin):
+    def get(self, request):
+        user = get_object_or_404(User, pk=request.user.id)
+        profile_form = ProfileForm()
+        user_form = UserForm(initial={'username': user.username,
+                                      'first_name': user.first_name,
+                                      'last_name': user.last_name,
+                                      'email': user.email})
+        bookings = BookingModel.objects.filter(user_id=user.id).order_by('-check_in_date')
+        future_bookings = bookings.filter(check_in_date__gt=datetime.now().date())
+        booking_history = bookings.filter(check_out_date__lt=datetime.now().date())
+        return render(request, 'users/profile.html',
+                      context={'user': user, 'user_form': user_form, 'profile_form': profile_form,
+                               'future_bookings': future_bookings, 'booking_history': booking_history})
+
+    @transaction.atomic
+    def post(self, request):
+        no_birth_date = Profile.objects.filter(user=request.user, birth_date=None)
+        user_form = UserForm(request.POST, instance=request.user)
+        profile_form = ProfileForm(request.POST, instance=request.user.profile)
+        if user_form.is_valid() and profile_form.is_valid() and no_birth_date:
+            user_form.save()
+            profile_form.save()
+        return redirect('profile')

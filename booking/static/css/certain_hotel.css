@@ -92,5 +92,8 @@ img {
     }
 
 .form-label {
-    display: flex;
-    }
+    min-width: 200px;
+    vertical-align: top;
+    font-weight: bolder;
+    color: #3A5199;
+}

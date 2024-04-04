@@ -1,6 +1,8 @@
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django import forms
+from django.forms import DateField, DateInput
+from users.models import Profile
 
 
 class RegisterUserForm(UserCreationForm):
@@ -20,3 +22,28 @@ class LoginUserForm(AuthenticationForm):
     username = forms.CharField(label='Login', widget=forms.TextInput(attrs={'class': 'form-input'}))
     password = forms.CharField(label='Password', widget=forms.PasswordInput(attrs={'class': 'form-input'}))
     email = forms.EmailField(label='Email', widget=forms.EmailInput(attrs={'class': 'form-input'}))
+
+
+class UserForm(forms.ModelForm):
+    email = forms.EmailField(required=True)
+
+    class Meta:
+        model = User
+        fields = ['username', 'first_name', 'last_name', 'email']
+
+
+class BirthdayDateInput(DateInput):
+    input_type = 'date'
+
+
+class BirthdayDateField(DateField):
+    widget = BirthdayDateInput
+
+
+class ProfileForm(forms.ModelForm):
+    birth_date = BirthdayDateField()
+
+    class Meta:
+        model = Profile
+        fields = ['birth_date', ]
+

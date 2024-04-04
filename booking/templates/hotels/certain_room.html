@@ -38,9 +38,9 @@
             <div class="form-error">{{reservation_form.errors}}</div>
             <input type="submit" value="Reserve" class="button">
         </form>
-        {%else %}
-            <p class="warning">You must be logged in to make a reservation.</p>
-        {% endif %}
+            {%else %}
+                <p class="warning">You must be logged in to make a reservation.</p>
+            {% endif %}
         <button type="button" class="collapsible">View already booked dates</button>
         <div class="unavailable-dates">
         {% if unavailable_dates %}

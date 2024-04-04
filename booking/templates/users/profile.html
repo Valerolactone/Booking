@@ -1,0 +1,88 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block title %}Profile{% endblock title %}
+
+{% block css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/profile.css' %}" type="text/css">
+{% endblock css %}
+
+{% block header %}{{user.username}}'s Profile {% endblock %}
+
+{% block content %}
+<div class="wrapper">
+    <div class="profile">
+        <div class="user-profile">
+            <p class="user-info"><label class="user-label"> Username: </label> {{user.username}}</p>
+            <p class="user-info"><label class="user-label"> Email: </label> {{user.email}}</p>
+            {% if user.first_name %}
+                <p class="user-info"><label class="user-label"> First name: </label> {{user.first_name}}</p>
+            {% endif %}
+            {% if user.last_name %}
+                <p class="user-info"><label class="user-label"> Last name: </label> {{user.last_name}}</p>
+            {% endif %}
+            {% if user.profile.birth_date %}
+                <p class="user-info"><label class="user-label"> Birthday: </label> {{user.profile.birth_date}} </p>
+            {% endif %}
+        </div>
+        <div class="update">
+            <button type="button" class="collapsible">Update Profile</button>
+            <div class="update-profile">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-error">{{form.non_field_errors}}</div>
+                <p class="form-input"><label class="form-label">Username: </label>{{ user_form.username }}</p>
+                <p class="form-input"><label class="form-label">Email: </label>{{ user_form.email }}</p>
+                <p class="form-input"><label class="form-label">First name: </label>{{ user_form.first_name }}</p>
+                <p class="form-input"><label class="form-label">Last name: </label>{{ user_form.last_name }}</p>
+                {% if not user.profile.birth_date %}
+                    <p class="warning">You will not be able to change your date of birth in the future.</p>
+                    <p class="form-input"><label class="form-label">Birthday: </label>{{ profile_form.birth_date }}</p>
+                {% endif %}
+                <input type="submit" value="Update" class="button">
+            </form>
+        </div>
+    </div>
+</div>
+    <div class="reservations">
+        {% if future_bookings %}
+            <button type="button" class="collapsible">Upcoming Bookings</button>
+            <div class="bookings">
+                {% for booking in future_bookings %}
+                    <p class="booking-info">
+                        A {{booking.room_id.room_type}} room in {{booking.room_id.hotel_id.rating}} &#11088;
+                        {{booking.room_id.hotel_id.name}} from {{booking.check_in_date}} to {{booking.check_out_date}}
+                    </p>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% if booking_history %}
+            <button type="button" class="collapsible">Booking History</button>
+            <div class="bookings">
+                {% for booking in booking_history %}
+                    <p class="booking-info">
+                        A {{booking.room_id.room_type}} room in {{booking.room_id.hotel_id.rating}} &#11088;
+                        {{booking.room_id.hotel_id.name}} from {{booking.check_in_date}} to {{booking.check_out_date}}
+                    </p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+<script>
+var coll = document.getElementsByClassName("collapsible");
+var i;
+
+for (i = 0; i < coll.length; i++) {
+  coll[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var content = this.nextElementSibling;
+    if (content.style.display === "block") {
+      content.style.display = "none";
+    } else {
+      content.style.display = "block";
+    }
+  });
+}
+</script>
+{% endblock %}

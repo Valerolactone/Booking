@@ -14,7 +14,8 @@ class DateRange(Func):
 
 
 class BookingModel(models.Model):
-    user_id = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='User')
+    user_id = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='User',
+                                related_name='user_reservations')
     room_id = models.ForeignKey(RoomModel, on_delete=models.CASCADE, verbose_name='Room')
     check_in_date = models.DateField()
     check_out_date = models.DateField()
