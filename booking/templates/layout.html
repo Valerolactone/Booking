@@ -14,7 +14,7 @@
 <body>
 <header id="page_header">
     <div id="site_name"> BOOKING</div>
-    <div id="authentication">
+    <div class="authentication">
     {% if request.user.is_authenticated %}
         Welcome, {{user.username}} | <a href="{% url 'logout' %}">Logout</a>
     {% else %}

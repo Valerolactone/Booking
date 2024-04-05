@@ -19,6 +19,7 @@
     display: none;
     font-weight: bold;
     overflow: hidden;
+    margin-top: 15px;
     }
 
 .update-profile {
@@ -59,4 +60,11 @@
     font-weight: initial;
     margin: 0px;
     color: red;
+    }
+
+.review-link a, .booking-link a {
+    font-weight: bold;
+    color: #3A5199;
+    text-decoration: none;
+    display: inline-block;
     }

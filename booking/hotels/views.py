@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from django.core.exceptions import ValidationError
 from django.db.models import Prefetch, Avg, Func
 from django.shortcuts import render, get_object_or_404, redirect
@@ -8,6 +8,7 @@ from django.db import transaction, DatabaseError
 from .models import HotelModel, RoomModel, PhotoModel
 from reservations.forms import CommentForm, ReservationForm
 from reservations.models import ReviewModel, BookingModel, DateRange
+from reservations.services import get_unavailable_dates
 
 
 class Round(Func):
@@ -57,33 +58,7 @@ class RoomInfoView(View):
         room = get_object_or_404(RoomModel, slug=slug)
         photos = PhotoModel.objects.filter(room_id=room.id)
         reservation_form = ReservationForm()
-
-        def get_unavailable_dates():
-            bookings = BookingModel.objects.filter(room_id=room.id)
-            range_boundaries = []
-            disabled_dates = []
-            for booking in bookings:
-                check_in = booking.check_in_date
-                check_out = booking.check_out_date
-                range_boundaries.append(check_in)
-                range_boundaries.append(check_out)
-
-                check_in += timedelta(days=1)
-
-                while check_in < check_out:
-                    disabled_dates.append(check_in)
-                    check_in += timedelta(days=1)
-
-            for date in range_boundaries:
-                if range_boundaries.count(date) > 1:
-                    if date not in disabled_dates:
-                        disabled_dates.append(date)
-
-            disabled_dates.sort()
-
-            return disabled_dates
-
-        unavailable_dates = get_unavailable_dates()
+        unavailable_dates = get_unavailable_dates(room.id)
 
         return render(request, 'hotels/certain_room.html',
                       context={'room': room, 'photos': photos, 'reservation_form': reservation_form,

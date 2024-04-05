@@ -37,7 +37,7 @@
                 <p class="form-input"><label class="form-label">First name: </label>{{ user_form.first_name }}</p>
                 <p class="form-input"><label class="form-label">Last name: </label>{{ user_form.last_name }}</p>
                 {% if not user.profile.birth_date %}
-                    <p class="warning">You will not be able to change your date of birth in the future.</p>
+                    <p class="warning">The date of birth cannot be changed once set.</p>
                     <p class="form-input"><label class="form-label">Birthday: </label>{{ profile_form.birth_date }}</p>
                 {% endif %}
                 <input type="submit" value="Update" class="button">
@@ -46,14 +46,26 @@
     </div>
 </div>
     <div class="reservations">
+        {% if current_bookings %}
+            <button type="button" class="collapsible">Current Bookings</button>
+            <div class="bookings">
+                {% for booking in current_bookings %}
+                    <div class="booking-info">
+                        A {{booking.room_id.room_type}} room in {{booking.room_id.hotel_id.rating}} &#11088;
+                        {{booking.room_id.hotel_id.name}} from {{booking.check_in_date}} to {{booking.check_out_date}}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
         {% if future_bookings %}
             <button type="button" class="collapsible">Upcoming Bookings</button>
             <div class="bookings">
                 {% for booking in future_bookings %}
-                    <p class="booking-info">
+                    <div class="booking-info">
                         A {{booking.room_id.room_type}} room in {{booking.room_id.hotel_id.rating}} &#11088;
                         {{booking.room_id.hotel_id.name}} from {{booking.check_in_date}} to {{booking.check_out_date}}
-                    </p>
+                        <span class="booking-link"><a href="/booking/{{booking.pk}}">(View booking details)</a></span>
+                    </div>
                 {% endfor %}
             </div>
         {% endif %}
@@ -61,10 +73,11 @@
             <button type="button" class="collapsible">Booking History</button>
             <div class="bookings">
                 {% for booking in booking_history %}
-                    <p class="booking-info">
+                    <div class="booking-info">
                         A {{booking.room_id.room_type}} room in {{booking.room_id.hotel_id.rating}} &#11088;
                         {{booking.room_id.hotel_id.name}} from {{booking.check_in_date}} to {{booking.check_out_date}}
-                    </p>
+                        <span class="review-link"><a href="/hotel/{{booking.room_id.hotel_id.slug}}">(Leave a review)</a></span>
+                    </div>
                 {% endfor %}
             </div>
         {% endif %}

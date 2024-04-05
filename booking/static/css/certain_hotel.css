@@ -24,10 +24,10 @@ img {
     text-align: justify;
     }
 
-.room a:link, a:visited {
+.room a {
     font-weight: bold;
     font-size: 15px;
-    color: white;
+    color: #3A5199;
     text-decoration: none;
     display: inline-block;
     }
@@ -64,14 +64,6 @@ img {
     font-weight: bold;
     }
 
-.rooms {
-    background: #3A5199;
-    color: white;
-    border: 10px;
-    box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.5);
-    margin: 20px;
-    padding: 5px 25px;
-    }
 
 .form-input {
     margin: 10px;

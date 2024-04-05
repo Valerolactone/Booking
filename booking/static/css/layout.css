@@ -28,7 +28,7 @@ header {
   cursive;
   }
 
-#authentication {
+.authentication {
   color: white;
   position: absolute;
   right: 5px;
@@ -38,7 +38,7 @@ header {
   cursive;
   }
 
-#authentication a:link, a:visited{
+.authentication a:link, a:visited{
   color: white;
   padding: 6px 5px;
   text-decoration: none;

@@ -36,8 +36,9 @@ def logout_user(request):
     return redirect('login')
 
 
-class ProfileView(View, LoginRequiredMixin):
+class ProfileView(LoginRequiredMixin, View):
     def get(self, request):
+        current_date = datetime.now().date()
         user = get_object_or_404(User, pk=request.user.id)
         profile_form = ProfileForm()
         user_form = UserForm(initial={'username': user.username,
@@ -45,11 +46,13 @@ class ProfileView(View, LoginRequiredMixin):
                                       'last_name': user.last_name,
                                       'email': user.email})
         bookings = BookingModel.objects.filter(user_id=user.id).order_by('-check_in_date')
-        future_bookings = bookings.filter(check_in_date__gt=datetime.now().date())
-        booking_history = bookings.filter(check_out_date__lt=datetime.now().date())
+        future_bookings = bookings.filter(check_in_date__gt=current_date)
+        current_bookings = bookings.filter(check_in_date__lte=current_date, check_out_date__gte=current_date)
+        booking_history = bookings.filter(check_out_date__lt=current_date)
         return render(request, 'users/profile.html',
                       context={'user': user, 'user_form': user_form, 'profile_form': profile_form,
-                               'future_bookings': future_bookings, 'booking_history': booking_history})
+                               'future_bookings': future_bookings, 'booking_history': booking_history,
+                               'current_bookings': current_bookings})
 
     @transaction.atomic
     def post(self, request):

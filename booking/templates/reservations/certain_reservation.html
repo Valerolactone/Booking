@@ -1,0 +1,78 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block title %}Reservation{% endblock title %}
+
+{% block css %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/certain_room.css' %}" type="text/css">
+{% endblock css %}
+
+{% block header %}{{booking.room_id.number}} {{booking.room_id.room_type}} hotel room for {{booking.room_id.price_per_night}}$ per night{% endblock %}
+
+{% block content %}
+    <div class="info">
+        <p class="price">{{booking.room_id.hotel_id.rating}} &#11088; {{booking.room_id.hotel_id.name}}, {{booking.room_id.hotel_id.location}}, {{booking.room_id.hotel_id.city}}, {{booking.room_id.hotel_id.country}}</p>
+        {% if photos %}
+            <div class="photos">
+                {% for photo in photos %}
+                <a href="/media/{{photo.photo}}"> <img src='/media/{{photo.photo}}'></a>
+                {% endfor %}
+            </div>
+        {% endif%}
+        <p class="description"> {{booking.room_id.description}}</p>
+    </div>
+{% endblock %}
+{%block left-sidebar %}
+    <div class="wrapper">
+        <div class="reservation-info">
+            <h3>Reservation Details:</h3>
+            <p><label class="form-label">Check-in date: </label> {{booking.check_in_date}}</p>
+            <p><label class="form-label">Check-out date: </label> {{booking.check_out_date}}</p>
+            <p><label class="form-label">Total price: </label> {{price}}$</p>
+        </div>
+        <div class="reservation">
+            <form method="POST" class="reservation-form">
+                {% csrf_token %}
+                <h3>Update the reservation</h3>
+                {% if request.user.is_authenticated %}
+                <div class="form-error">{{update_reservation_form.non_field_errors}}</div>
+                <input type="hidden" name="room_id" id="id_room" value="{{booking.room_id.id}}">
+                <input type="hidden" name="cancelled" id="id_cancelled" value="False">
+                <p class="dates"><label class="form-label">Check-in: </label> {{ update_reservation_form.check_in_date }} </p>
+                <p class="dates"><label class="form-label">Check-out: </label> {{ update_reservation_form.check_out_date }} </p>
+                <div class="form-error">{{update_reservation_form.errors}}</div>
+                <input type="submit" value="Reserve" class="button">
+            </form>
+                {%else %}
+                    <p class="warning">You must be logged in to make a reservation.</p>
+                {% endif %}
+            <button type="button" class="collapsible">View already booked dates</button>
+            <div class="unavailable-dates">
+            {% if unavailable_dates %}
+                <div class="booked_dates">
+                    {% for date in unavailable_dates %}
+                    <span>{{date}}</span>
+                    {%endfor%}
+                </div>
+            {% endif %}
+            </div>
+        </div>
+    </div>
+<script>
+var coll = document.getElementsByClassName("collapsible");
+var i;
+
+for (i = 0; i < coll.length; i++) {
+  coll[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var content = this.nextElementSibling;
+    if (content.style.display === "block") {
+      content.style.display = "none";
+    } else {
+      content.style.display = "block";
+    }
+  });
+}
+</script>
+{% endblock %}
