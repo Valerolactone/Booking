@@ -41,7 +41,6 @@
         {% else %}
             <h3 class="no-rooms">Sorry, there are no rooms available at this hotel right now.</h3>
         {% endif %}
-
     </div>
 
     <div class="reviews">
@@ -57,7 +56,7 @@
         {% else %}
             <h4>There are no reviews for this hotel.</h4>
         {% endif %}
-        {% if request.user.is_authenticated and request.user.id in users_who_booked and check_out_dates %}
+        {% if request.user.is_authenticated and not request.user.is_superuser and request.user.id in users_who_booked and check_out_dates %}
         <form method="POST" class="review-form">
             <h3>Share your experiences with others</h3>
             {% csrf_token %}
@@ -70,4 +69,9 @@
         </form>
         {% endif %}
     </div>
+{% endblock %}
+{%block left-sidebar %}
+    {% if request.user.is_superuser %}
+    <div class="update-hotel"><a href="/manage/update_hotel/{{hotel.id}}">UPDATE HOTEL INFO</a></div>
+    {% endif %}
 {% endblock %}

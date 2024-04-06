@@ -1,11 +1,15 @@
 from datetime import datetime
+
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import ValidationError
 from django.db.models import Prefetch, Avg, Func
 from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse, reverse_lazy
 from django.views import View
-from django.views.generic import ListView
+from django.views.generic import ListView, CreateView, UpdateView
 from django.db import transaction, DatabaseError
 from .models import HotelModel, RoomModel, PhotoModel
+from .forms import HotelForm, photo_for_hotel_inline_formset
 from reservations.forms import CommentForm, ReservationForm
 from reservations.models import ReviewModel, BookingModel, DateRange
 from reservations.services import get_unavailable_dates
@@ -25,6 +29,86 @@ class ListHotelsView(ListView):
     def get_queryset(self):
         return HotelModel.objects.prefetch_related(
             Prefetch('photos', queryset=PhotoModel.objects.filter(photo_name='cover')))
+
+
+class CreateHotelView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    def test_func(self):
+        return self.request.user.is_superuser
+
+    form_class = HotelForm
+    template_name = 'hotels/new_hotel.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(CreateHotelView, self).get_context_data(**kwargs)
+        context['photo_formset'] = photo_for_hotel_inline_formset()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = None
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        photo_formset = photo_for_hotel_inline_formset(self.request.POST, self.request.FILES)
+        if form.is_valid() and photo_formset.is_valid():
+            return self.form_valid(form, photo_formset)
+        else:
+            return self.form_invalid(form, photo_formset)
+
+    def form_valid(self, form, photo_formset):
+        self.object = form.save(commit=False)
+        self.object.save()
+        photos = photo_formset.save(commit=False)
+        for photo in photos:
+            photo.hotel_id = self.object
+            photo.save()
+        return redirect(reverse('hotels'))
+
+    def form_invalid(self, form, photo_formset):
+        return self.render_to_response(
+            self.get_context_data(form=form, photo_formset=photo_formset))
+
+
+class UpdateHotelView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    def test_func(self):
+        return self.request.user.is_superuser
+
+    model = HotelModel
+    form_class = HotelForm
+    template_name = 'hotels/update_hotel.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(UpdateHotelView, self).get_context_data(**kwargs)
+        a = PhotoModel.objects.filter(hotel_id=self.object.id).values_list('photo_name', 'photo')
+        context['number_of_photos'] = PhotoModel.objects.filter(hotel_id=self.object.id).count()
+        if self.request.POST:
+            context['form'] = HotelForm(self.request.POST, instance=self.object)
+            context['photo_formset'] = photo_for_hotel_inline_formset(self.request.POST, self.request.FILES,
+                                                                      instance=self.object)
+        else:
+            context['form'] = HotelForm(instance=self.object)
+            context['photo_formset'] = photo_for_hotel_inline_formset(instance=self.object)
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        photo_formset = photo_for_hotel_inline_formset(self.request.POST, self.request.FILES)
+        print(form.is_valid())
+        print(photo_formset.is_valid())
+        if form.is_valid() and photo_formset.is_valid():
+            return self.form_valid(form, photo_formset)
+        else:
+            return self.form_invalid(form, photo_formset)
+
+    def form_valid(self, form, photo_formset):
+        self.object = form.save()
+        photo_formset.instance = self.object
+        photo_formset.save()
+        return redirect(reverse('hotel_info', kwargs={'slug': self.object.slug}))
+
+    def form_invalid(self, form, photo_formset):
+        return self.render_to_response(
+            self.get_context_data(form=form, photo_formset=photo_formset))
 
 
 class HotelInfoView(View):

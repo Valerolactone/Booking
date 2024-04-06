@@ -4,11 +4,17 @@
     box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.5);
     margin: 20px;
     padding: 5px 25px;
+
     }
 
 .pagination {
     color: #3A5199;
     font-weight: bold;
+    }
+
+.hotel_link a:link, a:visited {
+    text-decoration: none;
+    display: inline-block;
     }
 
 .pagination a {
@@ -33,9 +39,16 @@ h3 {
     font-size: 12px;
     }
 
-.hotel_link a:link, a:visited {
+.new-hotel a {
     text-decoration: none;
     display: inline-block;
+    color: #3A5199;
+    padding: 15px 5px;
+    font-weight: bold;
+    font-size: 20px;
+    font-family:
+    Brush Script Std,
+    cursive;
     }
 
 img {

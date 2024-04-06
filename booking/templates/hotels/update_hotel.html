@@ -1,0 +1,48 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block title %}New hotel{% endblock title %}
+
+{% block css %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/manage_hotel.css' %}" type="text/css">
+{% endblock css %}
+
+{% block header %}Update hotel info{% endblock %}
+
+{% block content %}
+<form method="POST" class="hotel-form" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="wrapper">
+        <div class="main-form">
+            <p class="form-error">{{form.non_form_errors}}</p>
+            {% for field in form %}
+                <p class="form-input"> <label class="form-label">{{field.label_tag}}</label> {{field}}</p>
+                {% if field.errors %}
+                    <p class="form-error">{{field.errors|striptags}}</p>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <div class="inline-forms">
+            <h3>Update hotel photos</h3>
+            {{ photo_formset.non_form_errors }}
+            {{ photo_formset.management_form }}
+            {% for form in photo_formset %}
+                <div class="inline-form">
+                    {% if form.photo %}
+                    <p class="form-input"> <label class="form-label">{{form.photo_name.label_tag}}</label> {{form.photo_name}}</p>
+                    <p class="form-input"> <label class="form-label">{{form.photo.label_tag}}</label> {{form.photo}}</p>
+                    {% if photo_formset.can_delete %}
+                        <div class="ml-4">{{ form.DELETE }} {{ form.DELETE.label }}</div>
+                    {% endif %}
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="form-buttons">
+        <input type="submit" value="Update" class="button">
+        <a href="{%url 'hotels' %}" class="button">Cancel</a>
+    </div>
+</form>
+{% endblock %}

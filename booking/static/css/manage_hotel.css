@@ -1,0 +1,13 @@
+.wrapper {
+    display: flex;
+}
+
+.inline-forms {
+    margin-inline-start: 100px;
+}
+
+.inline-form a {
+    text-decoration: none;
+    display: inline-block;
+    color: #3A5199;
+}

@@ -53,3 +53,8 @@
         </span>
     </div>
 {% endblock %}
+{%block left-sidebar %}
+    {% if request.user.is_superuser %}
+    <div class="new-hotel"><a href="{% url 'add_hotel' %}">ADD NEW HOTEL</a></div>
+    {% endif %}
+{% endblock %}

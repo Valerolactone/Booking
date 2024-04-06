@@ -1,4 +1,5 @@
 from datetime import datetime
+
 from django.contrib.auth import logout, login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
@@ -15,12 +16,12 @@ from reservations.models import BookingModel
 class RegisterUser(CreateView):
     form_class = RegisterUserForm
     template_name = 'users/register.html'
-    success_url = reverse_lazy('hotels')
+    success_url = reverse_lazy('profile')
 
     def form_valid(self, form):
         user = form.save()
         login(self.request, user)
-        return redirect('hotels')
+        return redirect('profile')
 
 
 class LoginUser(LoginView):
