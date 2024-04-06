@@ -45,14 +45,16 @@ class ProfileView(LoginRequiredMixin, View):
                                       'first_name': user.first_name,
                                       'last_name': user.last_name,
                                       'email': user.email})
-        bookings = BookingModel.objects.filter(user_id=user.id).order_by('-check_in_date')
-        future_bookings = bookings.filter(check_in_date__gt=current_date)
-        current_bookings = bookings.filter(check_in_date__lte=current_date, check_out_date__gte=current_date)
-        booking_history = bookings.filter(check_out_date__lt=current_date)
+        bookings = BookingModel.objects.filter(user_id=user.id).order_by('-check_out_date')
+        future_bookings = bookings.filter(check_in_date__gt=current_date, deleted=False)
+        current_bookings = bookings.filter(check_in_date__lte=current_date, check_out_date__gte=current_date,
+                                           deleted=False)
+        booking_history = bookings.filter(check_out_date__lt=current_date, deleted=False)
+        canceled_bookings = bookings.filter(deleted=True)
         return render(request, 'users/profile.html',
                       context={'user': user, 'user_form': user_form, 'profile_form': profile_form,
                                'future_bookings': future_bookings, 'booking_history': booking_history,
-                               'current_bookings': current_bookings})
+                               'current_bookings': current_bookings, 'canceled_bookings': canceled_bookings})
 
     @transaction.atomic
     def post(self, request):

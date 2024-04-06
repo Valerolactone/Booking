@@ -46,41 +46,59 @@
     </div>
 </div>
     <div class="reservations">
+        <button type="button" class="collapsible">Current Bookings</button>
         {% if current_bookings %}
-            <button type="button" class="collapsible">Current Bookings</button>
-            <div class="bookings">
-                {% for booking in current_bookings %}
-                    <div class="booking-info">
-                        A {{booking.room_id.room_type}} room in {{booking.room_id.hotel_id.rating}} &#11088;
-                        {{booking.room_id.hotel_id.name}} from {{booking.check_in_date}} to {{booking.check_out_date}}
-                    </div>
-                {% endfor %}
-            </div>
+        <div class="bookings">
+            {% for booking in current_bookings %}
+                <div class="booking-info">
+                    A {{booking.room_id.room_type}} room in {{booking.room_id.hotel_id.rating}} &#11088;
+                    {{booking.room_id.hotel_id.name}} from {{booking.check_in_date}} to {{booking.check_out_date}}
+                     <span class="booking-link"><a href="/booking/{{booking.pk}}">(View booking details)</a></span>
+                </div>
+            {% endfor %}
+        </div>
+        {% else %}
+            <p>You have no current bookings.</p>
         {% endif %}
+        <button type="button" class="collapsible">Upcoming Bookings</button>
         {% if future_bookings %}
-            <button type="button" class="collapsible">Upcoming Bookings</button>
-            <div class="bookings">
-                {% for booking in future_bookings %}
-                    <div class="booking-info">
-                        A {{booking.room_id.room_type}} room in {{booking.room_id.hotel_id.rating}} &#11088;
-                        {{booking.room_id.hotel_id.name}} from {{booking.check_in_date}} to {{booking.check_out_date}}
-                        <span class="booking-link"><a href="/booking/{{booking.pk}}">(View booking details)</a></span>
-                    </div>
-                {% endfor %}
-            </div>
+        <div class="bookings">
+            {% for booking in future_bookings %}
+                <div class="booking-info">
+                    A {{booking.room_id.room_type}} room in {{booking.room_id.hotel_id.rating}} &#11088;
+                    {{booking.room_id.hotel_id.name}} from {{booking.check_in_date}} to {{booking.check_out_date}}
+                    <span class="booking-link"><a href="/booking/{{booking.pk}}">(View booking details)</a></span>
+                </div>
+            {% endfor %}
+        </div>
+        {% else %}
+            <p>You have no future bookings.</p>
         {% endif %}
-        {% if booking_history %}
-            <button type="button" class="collapsible">Booking History</button>
-            <div class="bookings">
-                {% for booking in booking_history %}
-                    <div class="booking-info">
-                        A {{booking.room_id.room_type}} room in {{booking.room_id.hotel_id.rating}} &#11088;
-                        {{booking.room_id.hotel_id.name}} from {{booking.check_in_date}} to {{booking.check_out_date}}
-                        <span class="review-link"><a href="/hotel/{{booking.room_id.hotel_id.slug}}">(Leave a review)</a></span>
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
+        <button type="button" class="collapsible">Booking History</button>
+        <div class="bookings">
+            {% if booking_history %}
+            {% for booking in booking_history %}
+                <div class="booking-info">
+                    A {{booking.room_id.room_type}} room in {{booking.room_id.hotel_id.rating}} &#11088;
+                    {{booking.room_id.hotel_id.name}} from {{booking.check_in_date}} to {{booking.check_out_date}}
+                    <span class="review-link"><a href="/hotel/{{booking.room_id.hotel_id.slug}}">(Leave a review)</a></span>
+                </div>
+            {% endfor %}
+            {% else %}
+                <p>Your booking history is empty.</p>
+            {% endif %}
+            {% if canceled_bookings %}
+                <h3>Cancelled Bookings:</h3>
+            {% for booking in canceled_bookings %}
+                <div class="booking-info">
+                    A {{booking.room_id.room_type}} room in {{booking.room_id.hotel_id.rating}} &#11088;
+                    {{booking.room_id.hotel_id.name}} from {{booking.check_in_date}} to {{booking.check_out_date}}
+                </div>
+            {% endfor %}
+            {% else %}
+                <p>Your booking history is empty.</p>
+            {% endif %}
+        </div>
     </div>
 <script>
 var coll = document.getElementsByClassName("collapsible");
