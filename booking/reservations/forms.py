@@ -1,7 +1,10 @@
 from datetime import datetime, timedelta
 import pandas as pd
 from django import forms
+from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.mail import send_mail
+from django.db import transaction
 from django.forms import HiddenInput
 from django.forms.fields import DateField
 from django.forms.widgets import DateInput
@@ -54,6 +57,22 @@ class ReservationForm(forms.ModelForm):
 
         return cleaned_data
 
+    def save(self):
+        instance = super(ReservationForm, self).save()
+        @transaction.on_commit
+        def send_booking_confirmation_email():
+            send_mail(
+                subject='Booking Confirmation',
+                message=f'We are confirming your {instance.room_id.number}-{instance.room_id.room_type} hotel room '
+                        f'reservation in {instance.room_id.hotel_id.name} from the {instance.check_in_date} '
+                        f'through the {instance.check_out_date}.',
+                from_email=settings.EMAIL_HOST_USER,
+                recipient_list=[self.cleaned_data["user_id"].email],
+                fail_silently=False,
+            )
+
+        return instance
+
 
 class UpdateReservationForm(forms.ModelForm):
     check_in_date = ReservationDateField()
@@ -87,21 +106,19 @@ class UpdateReservationForm(forms.ModelForm):
 
         return cleaned_data
 
-
-"""    def save(self):
-        instance = super(ReservationForm, self).save()
-        a = self.cleaned_data["user_id"].email
-        print(a)
+    def save(self):
+        instance = super(UpdateReservationForm, self).save()
 
         @transaction.on_commit
-        def send_booking_email():
-            message = f"generate the message from the {instance}"
+        def send_booking_confirmation_email():
             send_mail(
-                "Subject here",
-                message,
-                "from@example.com",
-                [self.cleaned_data["user_id"].email],
+                subject='Update Booking Confirmation',
+                message=f'We are confirming that your {instance.room_id.number}-{instance.room_id.room_type} hotel room '
+                        f'reservation in {instance.room_id.hotel_id.name} has had the dates changed. New booking dates '
+                        f' from {instance.check_in_date} to {instance.check_out_date}.',
+                from_email=settings.EMAIL_HOST_USER,
+                recipient_list=[instance.user_id.email],
                 fail_silently=False,
             )
 
-        return instance"""
+        return instance

@@ -1,5 +1,9 @@
 from datetime import datetime
+
+from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.core.mail import send_mail
+from django.db import transaction
 from django.db.models import Avg, Count, Prefetch
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views import View
@@ -38,6 +42,19 @@ class BookingInfoView(LoginRequiredMixin, View):
             booking.cancelled = True
             booking.deleted_at = datetime.now()
             booking.save()
+            if request.user.is_superuser:
+                @transaction.on_commit
+                def send_booking_confirmation_email():
+                    send_mail(
+                        subject='Cancellation of Booking',
+                        message=f'We are sorry to inform you, but due to the circumstances  we have to cancel '
+                                f'your booking for room {booking.room_id.number}-{booking.room_id.room_type} '
+                                f'at the hotel {booking.room_id.hotel_id.name} from the {booking.check_in_date} '
+                                f'to the {booking.check_out_date}.',
+                        from_email=settings.EMAIL_HOST_USER,
+                        recipient_list=[booking.user_id.email],
+                        fail_silently=False,
+                    )
             return redirect('profile')
 
 
