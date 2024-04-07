@@ -1,33 +1,34 @@
 {% extends 'layout.html' %}
 {% load static %}
 
-{% block title %}Hotels{% endblock title %}
+{% block title %}Analytics{% endblock title %}
 
-{% block header %}Hotels{% endblock %}
+{% block header %}Analytics{% endblock %}
 
 {% block css %}
     {{ block.super }}
-    <link rel="stylesheet" href="{% static 'css/hotels.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/bookings.css' %}" type="text/css">
 {% endblock css %}
 
 {% block content %}
-    <div class="hotels">
+    <div class="bookings">
+        <h2><label>Total count of bookings: </label>{{total_bookings.id__count}}</h2>
+        {{user_hotels_rating}}
+        {{hotel_bookings_count}}
+
         {% if hotels %}
             {% for hotel in hotels%}
-            <div class="hotel">
-                <a class="hotel_link" href="/hotel/{{hotel.slug}}">
-                    <h3 class="hotel_name">{{hotel.rating}} &#11088; {{hotel.name}}</h3>
-                    <p class="hotel-address">{{hotel.country}}, {{hotel.city}}, {{hotel.location}}</p>
-                    {% for photo in hotel.photos.all %}
-                        <div class="photos">
-                            <img src='/media/{{photo.photo}}'>
-                        </div>
+                {% for hotel_count in hotel_bookings_count %}
+                    {% for key, value in hotel_count.items %}
+                        {% if key == "room_id__hotel_id" and value == hotel.id%}
+                        {% if key == "id__count" %}
+                        {{value}}
+                        {% endif %}
+                        <p>{{hotel.name}}</p>
+                    {% endif %}
                     {% endfor %}
-                </a>
-            </div>
+                {% endfor %}
             {% endfor %}
-        {% else %}
-            <p>There are no hotels here.</p>
         {% endif %}
     </div>
 

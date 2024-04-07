@@ -62,6 +62,7 @@ img {
 .user-rating {
     color: #3A5199;
     font-weight: bold;
+    margin-top: 10px;
     }
 
 
@@ -74,6 +75,10 @@ img {
   .button {
     width: 40em;
     margin: 10px;
+  }
+
+  .admin-button {
+    margin-inline-end: 15px;
   }
 }
 
@@ -100,4 +105,12 @@ img {
     font-family:
     Brush Script Std,
     cursive;
+    }
+
+.wrapper {
+    display: flex;
+    }
+
+h1 {
+    margin-bottom: 10px;
     }

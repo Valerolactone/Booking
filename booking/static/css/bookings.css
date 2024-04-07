@@ -1,0 +1,38 @@
+.bookings a {
+    text-decoration: none;
+    display: inline-block;
+    color: black;
+}
+
+.booking-label {
+    font-weight: bold;
+    color: #3A5199;
+}
+
+.pagination {
+    color: #3A5199;
+    font-weight: bold;
+    }
+
+.pagination a {
+    color: #3A5199;
+    padding: 15px 5px;
+    text-decoration: none;
+    display: inline-block;
+    }
+
+.booking {
+    background: #fff;
+    border: 10px;
+    box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.5);
+    margin: 20px;
+    padding: 5px 25px;
+    }
+
+.booking-info p {
+    margin-top: 0px;
+    }
+
+.user-info {
+    color: gray;
+    }

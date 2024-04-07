@@ -12,7 +12,7 @@
     font-weight: bold;
     }
 
-.hotel_link a:link, a:visited {
+.hotel a {
     text-decoration: none;
     display: inline-block;
     }

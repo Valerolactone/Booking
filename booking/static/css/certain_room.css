@@ -21,6 +21,10 @@ img {
     width: 10em;
     margin: 10px;
   }
+
+    .admin-button {
+    margin-inline-end: 15px;
+  }
 }
 
 .reservation-form {
@@ -73,3 +77,16 @@ img {
     margin: 2px;
     border-radius: 5px 5px 5px;
     }
+
+.wrapper {
+    display: flex;
+    }
+
+h1 {
+    margin-bottom: 10px;
+    }
+
+.right-sidebar {
+    display: flex;
+    flex-direction: column;
+}

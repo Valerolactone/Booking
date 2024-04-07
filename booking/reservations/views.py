@@ -1,11 +1,15 @@
 from datetime import datetime
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.db.models import Avg, Count, Prefetch
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views import View
+from django.views.generic import ListView
+
 from .forms import UpdateReservationForm
-from .models import BookingModel
-from hotels.models import PhotoModel, RoomModel
+from .models import BookingModel, ReviewModel
+from hotels.models import PhotoModel, RoomModel, HotelModel
 from .services import get_unavailable_dates
+from hotels.views import Round
 
 
 class BookingInfoView(LoginRequiredMixin, View):
@@ -35,3 +39,57 @@ class BookingInfoView(LoginRequiredMixin, View):
             booking.deleted_at = datetime.now()
             booking.save()
             return redirect('profile')
+
+
+class ListReviews(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    paginate_by = 5
+    model = ReviewModel
+    template_name = 'reservations/list_reviews.html'
+    context_object_name = 'reviews'
+
+    def get_queryset(self):
+        return ReviewModel.objects.all()
+
+    def test_func(self):
+        return self.request.user.is_superuser
+
+
+class ListRelevantBookings(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    paginate_by = 3
+    model = BookingModel
+    template_name = 'reservations/list_bookings.html'
+    context_object_name = 'bookings'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(ListRelevantBookings, self).get_context_data(**kwargs)
+        context['current_date'] = datetime.now().date()
+        return context
+
+    def get_queryset(self):
+        return BookingModel.objects.filter(check_out_date__gte=datetime.now().date()).order_by('room_id__hotel_id',
+                                                                                               '-check_in_date')
+
+    def test_func(self):
+        return self.request.user.is_superuser
+
+
+class AnalyticsView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    paginate_by = 4
+    model = HotelModel
+    template_name = 'reservations/analytics.html'
+    context_object_name = 'hotels'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(AnalyticsView, self).get_context_data(**kwargs)
+        context['total_bookings'] = BookingModel.objects.filter(deleted=False).aggregate(Count('id'))
+        context['hotel_bookings_count'] = BookingModel.objects.all().values('room_id__hotel_id').annotate(
+            Count('id'))
+        context['user_hotels_rating'] = ReviewModel.objects.all().values('hotel_id').annotate(
+            avg_rating=Round(Avg('rating')))
+        return context
+
+    def get_queryset(self):
+        return HotelModel.objects.all()
+
+    def test_func(self):
+        return self.request.user.is_superuser

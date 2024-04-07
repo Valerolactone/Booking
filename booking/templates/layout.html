@@ -26,7 +26,24 @@
         <h1>{% block header %}{% endblock %}</h1>
         {% block content %}{% endblock %}
     </article>
-    <div id="right_sidebar">{%block right-sidebar %}{% endblock %}</div>
+    <div id="right_sidebar">
+        <nav>
+            {% if request.user.is_superuser %}
+                <p>Administration panel</p>
+                    <ul class="administration">
+                        <li class="admin-link"><a href="{% url 'add_hotel' %}">Add New Hotel</a></li>
+                        <li class="admin-link"><a href="{% url 'add_room' %}">Add New Room</a></li>
+                        <li class="admin-link"><a href="{% url 'all_reviews' %}">All Reviews</a></li>
+                        <li class="admin-link"><a href="{% url 'all_bookings' %}">All Relevant Bookings</a></li>
+                        <li class="admin-link"><a href="{% url 'analytics' %}">Analytics</a></li>
+                    </ul>
+            {% endif %}
+            <ul>
+                <li class="user-link"><a href="{% url 'hotels' %}">Hotels</a></li>
+                <li class="user-link"><a href="{% url 'profile' %}">Profile</a></li>
+            </ul>
+        </nav>
+    </div>
     <div id="left_sidebar">{%block left-sidebar %}{% endblock %}</div>
     <footer id="page_footer">This website is a diploma project done by Valeriya Varanchuk in March-April 2024.</footer>
 </body>

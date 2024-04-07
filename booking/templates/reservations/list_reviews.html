@@ -1,0 +1,56 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block title %}Reviews{% endblock title %}
+
+{% block header %}Reviews{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/reviews.css' %}" type="text/css">
+{% endblock css %}
+
+{% block content %}
+    <div class="reviews">
+        {% if reviews %}
+        {% regroup reviews by hotel_id.name as hotel_reviews %}
+            {% for hotel in hotel_reviews%}
+            <div class="review">
+                <h3 class="hotel_name">{{hotel.grouper}} </h3>
+                {{hotel.grouper.id}}
+                {% for review in hotel.list%}
+                <div class="review-info">
+                    <p class="user-info">{{review.user_id.username}}, {{review.created_at}}</p>
+                    <p> <label class="review-label">Grade:</label> {{review.rating}}</p>
+                    <p> <label class="review-label">Review:</label> {{review.comment}}</p>
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>There are no reviews here.</p>
+        {% endif %}
+    </div>
+
+    {% for contact in page_obj %}
+        {{ contact.full_name|upper }}
+    {% endfor %}
+
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; first</a>
+                <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+            {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+        </span>
+    </div>
+{% endblock %}

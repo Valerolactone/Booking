@@ -11,6 +11,17 @@
 {% block header %}{{room.room_type}} room in {{room.hotel_id.rating}} &#11088; {{room.hotel_id.name}}{% endblock %}
 
 {% block content %}
+    <div class="wrapper">
+        {% if request.user.is_superuser %}
+            <a href="/manage/update_room/{{room.id}}"><input type="submit" value="UPDATE ROOM INFO" class="admin-button"></a>
+            <div class="delete_room">
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="submit" name='delete-button' value="DELETE ROOM" class="delete-button">
+                </form>
+            </div>
+        {% endif %}
+    </div>
     <div class="info">
         <p class="price">{{room.number}} {{room.room_type}} hotel room for {{room.price_per_night}}$ per night</p>
         {% if photos %}
@@ -52,15 +63,6 @@
                 </div>
             {% endif %}
             </div>
-        </div>
-    {% endif %}
-    {% if request.user.is_superuser %}
-    <div class="update-room"><a href="/manage/update_room/{{room.id}}">UPDATE ROOM INFO</a></div>
-        <div class="delete_reservation">
-            <form method="POST" class="reservation-form">
-                {% csrf_token %}
-                <input type="submit" name='delete-button' value="DELETE ROOM" class="delete-button">
-            </form>
         </div>
     {% endif %}
 <script>

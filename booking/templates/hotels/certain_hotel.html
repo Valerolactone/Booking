@@ -11,6 +11,17 @@
 {% block header %}{{hotel.rating}} &#11088; {{hotel.name}}{% endblock %}
 
 {% block content %}
+    <div class="wrapper">
+        {% if request.user.is_superuser %}
+            <a href="/manage/update_hotel/{{hotel.id}}"><input type="submit" value="UPDATE HOTEL INFO" class="admin-button"></a>
+            <div class="delete_hotel">
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="submit" name='delete-button' value="DELETE HOTEL" class="admin-button">
+                </form>
+            </div>
+        {% endif %}
+    </div>
     <div class="info">
         <p class="user-rating">
             {% if user_hotel_rating.avg_rating is not None %}
@@ -29,7 +40,6 @@
         {% endif%}
         <p class="description"> {{hotel.description}}</p>
     </div>
-
     <div class="rooms">
         <h2>Hotel rooms</h2>
         {% if rooms %}
@@ -49,7 +59,6 @@
             <h3 class="no-rooms">Sorry, there are no rooms available at this hotel right now.</h3>
         {% endif %}
     </div>
-
     <div class="reviews">
         {% if reviews %}
             <h3>Reviews</h3>
@@ -76,16 +85,4 @@
         </form>
         {% endif %}
     </div>
-{% endblock %}
-{%block left-sidebar %}
-    {% if request.user.is_superuser %}
-    <div class="update-hotel"><a href="/manage/update_hotel/{{hotel.id}}">UPDATE HOTEL INFO</a></div>
-    <div class="room"><a href="{% url 'add_room' %}">ADD NEW HOTEL ROOM</a></div>
-    <div class="delete_reservation">
-        <form method="POST" class="reservation-form">
-            {% csrf_token %}
-            <input type="submit" name='delete-button' value="DELETE HOTEL" class="delete-button">
-        </form>
-    </div>
-    {% endif %}
 {% endblock %}

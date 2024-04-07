@@ -1,0 +1,57 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block title %}Relevant Bookings{% endblock title %}
+
+{% block header %}Relevant Bookings {% endblock %}
+
+{% block css %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/bookings.css' %}" type="text/css">
+{% endblock css %}
+
+{% block content %}
+    <div class="bookings">
+        {% if bookings %}
+        {% regroup bookings by room_id.hotel_id.name as room_bookings %}
+            {% for room in room_bookings%}
+            <div class="booking">
+                <h3 class="hotel_name">{{room.grouper}}</h3>
+                {% for booking in room.list%}
+                    <div class="booking-info">
+                        <a class="booking_link" href="/booking/{{booking.id}}">
+                            <p class="user-info">{{booking.user_id.username}}, {{booking.room_id.number}}-{{booking.room_id.room_type}} room</p>
+                            <p> <label class="booking-label">Check-In Date:</label> {{booking.check_in_date}}</p>
+                            <p> <label class="booking-label">Check-Out Date:</label> {{booking.check_out_date}}</p>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>There are no reservations here.</p>
+        {% endif %}
+    </div>
+
+    {% for contact in page_obj %}
+        {{ contact.full_name|upper }}
+    {% endfor %}
+
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; first</a>
+                <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+            {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+        </span>
+    </div>
+{% endblock %}

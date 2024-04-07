@@ -24,14 +24,14 @@
     </div>
 {% endblock %}
 {%block left-sidebar %}
-    <div class="wrapper">
+    <div class="right-sidebar">
         <div class="reservation-info">
             <h3>Reservation Details:</h3>
             <p><label class="form-label">Check-in date: </label> {{booking.check_in_date}}</p>
             <p><label class="form-label">Check-out date: </label> {{booking.check_out_date}}</p>
             <p><label class="form-label">Total price: </label> {{price}}$</p>
         </div>
-        {% if request.user.is_authenticated and booking.check_in_date > current_date%}
+        {% if request.user.is_authenticated and booking.check_in_date > current_date or request.user.is_superuser and booking.check_in_date > current_date %}
         <div class="reservation">
             <form method="POST" class="reservation-form">
                 {% csrf_token %}
