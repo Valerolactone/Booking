@@ -34,9 +34,16 @@
         <h2>Hotel rooms</h2>
         {% if rooms %}
             {% for room in rooms %}
+                {% if room.available %}
                 <div class="room">
                    <a class="room_link" href="/room/{{room.slug}}"> {{room.number}} {{room.room_type}}</a>
                 </div>
+                {% endif %}
+                {% if not room.available and request.user.is_staff %}
+                <div class="room">
+                   <a class="room_link" href="/room/{{room.slug}}"> {{room.number}} {{room.room_type}} (unavailable)</a>
+                </div>
+                {% endif %}
             {% endfor %}
         {% else %}
             <h3 class="no-rooms">Sorry, there are no rooms available at this hotel right now.</h3>
@@ -73,10 +80,11 @@
 {%block left-sidebar %}
     {% if request.user.is_superuser %}
     <div class="update-hotel"><a href="/manage/update_hotel/{{hotel.id}}">UPDATE HOTEL INFO</a></div>
+    <div class="room"><a href="{% url 'add_room' %}">ADD NEW HOTEL ROOM</a></div>
     <div class="delete_reservation">
         <form method="POST" class="reservation-form">
             {% csrf_token %}
-            <input type="submit" name='delete-button' value="Delete" class="delete-button">
+            <input type="submit" name='delete-button' value="DELETE HOTEL" class="delete-button">
         </form>
     </div>
     {% endif %}

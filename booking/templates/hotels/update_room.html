@@ -1,17 +1,17 @@
 {% extends 'layout.html' %}
 {% load static %}
 
-{% block title %}Update hotel{% endblock title %}
+{% block title %}Update room{% endblock title %}
 
 {% block css %}
     {{ block.super }}
     <link rel="stylesheet" href="{% static 'css/manage_hotel.css' %}" type="text/css">
 {% endblock css %}
 
-{% block header %}Update hotel info{% endblock %}
+{% block header %}Update room info{% endblock %}
 
 {% block content %}
-<form method="POST" class="hotel-form" enctype="multipart/form-data">
+<form method="POST" class="room-form" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="wrapper">
         <div class="main-form">
@@ -34,7 +34,7 @@
                 {% endfor %}
             </script>
             <div class="inline-forms">
-                <h3>Update hotel photos</h3>
+                <h3>Update room photos</h3>
                 {{ photo_formset.non_form_errors }}
                 {% for error in formset.non_form_errors %}
                     <span style="color: red">{{ error }}</span>

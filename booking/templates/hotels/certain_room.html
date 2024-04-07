@@ -24,35 +24,45 @@
     </div>
 {% endblock %}
 {%block left-sidebar %}
-    <div class="reservation">
-        <form method="POST" class="reservation-form">
-            {% csrf_token %}
-            <h3>Make a reservation</h3>
-            {% if request.user.is_authenticated %}
-            <div class="form-error">{{reservation_form.non_field_errors}}</div>
-            <input type="hidden" name="room_id" id="id_room" value="{{room.id}}">
-            <input type="hidden" name="user_id" id="id_user" value="{{request.user.id}}">
-            <input type="hidden" name="cancelled" id="id_cancelled" value="False">
-            <p class="dates"><label class="form-label">Check-in: </label> {{ reservation_form.check_in_date }} </p>
-            <p class="dates"><label class="form-label">Check-out: </label> {{ reservation_form.check_out_date }} </p>
-            <div class="form-error">{{reservation_form.errors}}</div>
-            <input type="submit" value="Reserve" class="button">
-        </form>
-            {%else %}
-                <p class="warning">You must be logged in to make a reservation.</p>
+    {% if not request.user.is_superuser %}
+        <div class="reservation">
+            <form method="POST" class="reservation-form">
+                {% csrf_token %}
+                <h3>Make a reservation</h3>
+                {% if request.user.is_authenticated %}
+                <div class="form-error">{{reservation_form.non_field_errors}}</div>
+                <input type="hidden" name="room_id" id="id_room" value="{{room.id}}">
+                <input type="hidden" name="user_id" id="id_user" value="{{request.user.id}}">
+                <input type="hidden" name="cancelled" id="id_cancelled" value="False">
+                <p class="dates"><label class="form-label">Check-in: </label> {{ reservation_form.check_in_date }} </p>
+                <p class="dates"><label class="form-label">Check-out: </label> {{ reservation_form.check_out_date }} </p>
+                <div class="form-error">{{reservation_form.errors}}</div>
+                <input type="submit" value="Reserve" class="button" name="reservation-button">
+            </form>
+                {%else %}
+                    <p class="warning">You must be logged in to make a reservation.</p>
+                {% endif %}
+            <button type="button" class="collapsible">View already booked dates</button>
+            <div class="unavailable-dates">
+            {% if unavailable_dates %}
+                <div class="booked_dates">
+                    {% for date in unavailable_dates %}
+                    <span>{{date}}</span>
+                    {%endfor%}
+                </div>
             {% endif %}
-        <button type="button" class="collapsible">View already booked dates</button>
-        <div class="unavailable-dates">
-        {% if unavailable_dates %}
-            <div class="booked_dates">
-                {% for date in unavailable_dates %}
-                <span>{{date}}</span>
-                {%endfor%}
             </div>
-        {% endif %}
         </div>
-    </div>
-
+    {% endif %}
+    {% if request.user.is_superuser %}
+    <div class="update-room"><a href="/manage/update_room/{{room.id}}">UPDATE ROOM INFO</a></div>
+        <div class="delete_reservation">
+            <form method="POST" class="reservation-form">
+                {% csrf_token %}
+                <input type="submit" name='delete-button' value="DELETE ROOM" class="delete-button">
+            </form>
+        </div>
+    {% endif %}
 <script>
 var coll = document.getElementsByClassName("collapsible");
 var i;
