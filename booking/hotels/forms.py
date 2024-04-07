@@ -13,8 +13,7 @@ class HotelForm(forms.ModelForm):
 class PhotoForm(forms.ModelForm):
     class Meta:
         model = PhotoModel
-        fields = ['photo_name', 'photo', 'hotel_id']
+        fields = ['photo_name', 'photo']
 
 
-photo_for_hotel_inline_formset = inlineformset_factory(HotelModel, PhotoModel, form=PhotoForm, extra=3, can_delete_extra=True)
-
+PhotoFormSet = inlineformset_factory(HotelModel, PhotoModel, form=PhotoForm, can_delete=True, can_delete_extra=True)

@@ -65,7 +65,7 @@
             <input type="hidden" name="user_id" id="id_user" value="{{request.user.id}}">
             <p><label class="form-label">Rating</label>{{ comment_form.rating}}</p>
             <p><label class="form-label">Comment</label>{{ comment_form.comment}}</p>
-            <input type="submit" value="Publish" class="button">
+            <input type="submit" value="Publish" class="button" name='comment-button'>
         </form>
         {% endif %}
     </div>
@@ -73,5 +73,11 @@
 {%block left-sidebar %}
     {% if request.user.is_superuser %}
     <div class="update-hotel"><a href="/manage/update_hotel/{{hotel.id}}">UPDATE HOTEL INFO</a></div>
+    <div class="delete_reservation">
+        <form method="POST" class="reservation-form">
+            {% csrf_token %}
+            <input type="submit" name='delete-button' value="Delete" class="delete-button">
+        </form>
+    </div>
     {% endif %}
 {% endblock %}

@@ -23,22 +23,41 @@
                 {% endif %}
             {% endfor %}
         </div>
-        <div class="inline-forms">
-            <h3>Update hotel photos</h3>
-            {{ photo_formset.non_form_errors }}
-            {{ photo_formset.management_form }}
-            {% for form in photo_formset %}
-                <div class="inline-form">
-                    {% if form.photo %}
-                    <p class="form-input"> <label class="form-label">{{form.photo_name.label_tag}}</label> {{form.photo_name}}</p>
-                    <p class="form-input"> <label class="form-label">{{form.photo.label_tag}}</label> {{form.photo}}</p>
-                    {% if photo_formset.can_delete %}
-                        <div class="ml-4">{{ form.DELETE }} {{ form.DELETE.label }}</div>
-                    {% endif %}
-                    {% endif %}
-                </div>
-            {% endfor %}
-        </div>
+        {% with named_formsets.photos as formset %}
+            {{ formset.management_form }}
+            <script type="text/html" id="photos-template">
+                {% for fields in formset.empty_form.hidden_fields %}
+                    {{ fields }} gdfgdf
+                {% endfor %}
+                {% for fields in formset.empty_form.visible_fields %}
+                    {{fields}} fdgfdgfg
+                {% endfor %}
+            </script>
+            <div class="inline-forms">
+                <h3>Update hotel photos</h3>
+                {{ photo_formset.non_form_errors }}
+                {% for error in formset.non_form_errors %}
+                    <span style="color: red">{{ error }}</span>
+                {% endfor %}
+                {% for form in formset %}
+                    {{ form.management_form }}
+                        <div class="inline-form">
+                            {{ form.id }}
+                            {% for field in form.visible_fields %}
+                                {{field}}
+                                {% for error in field.errors %}
+                                    <span style="color: red">{{ error }}</span>
+                                {% endfor %}
+                            {% endfor %}
+                            {% if formss.instance.pk %}
+                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#exampleModal{{form.instance.pk}}">
+                                Delete
+                            </button>
+                            {% endif %}
+                        </div>
+                {% endfor %}
+            </div>
+        {% endwith %}
     </div>
     <div class="form-buttons">
         <input type="submit" value="Update" class="button">
