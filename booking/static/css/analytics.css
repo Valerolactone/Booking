@@ -1,0 +1,28 @@
+.bookings {
+    display: flex;
+    }
+
+.top-rating {
+    margin-inline-end: 10px;
+    }
+
+.table {
+  font-family: Lucida Sans Unicode, sans-serif;
+  border-collapse: collapse;
+}
+
+.table td, .top-rating th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.table tr:nth-child(even){background-color: #f2f2f2;}
+
+.table tr:hover {background-color: #ddd;}
+
+.table th {
+  padding: 12px;
+  background-color: #3A5199;
+  color: white;
+
+}

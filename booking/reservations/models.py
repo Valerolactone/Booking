@@ -46,7 +46,7 @@ class BookingModel(models.Model):
 
 class ReviewModel(models.Model):
     user_id = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING)
-    hotel_id = models.ForeignKey(HotelModel, on_delete=models.CASCADE)
+    hotel_id = models.ForeignKey(HotelModel, on_delete=models.CASCADE, related_name='reviews')
     comment = models.TextField(max_length=500, null=True, blank=True)
     rating = models.PositiveSmallIntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)])
     created_at = models.DateTimeField(auto_now_add=True)

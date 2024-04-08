@@ -91,22 +91,20 @@ class ListRelevantBookings(LoginRequiredMixin, UserPassesTestMixin, ListView):
 
 
 class AnalyticsView(LoginRequiredMixin, UserPassesTestMixin, ListView):
-    paginate_by = 4
-    model = HotelModel
+    model = BookingModel
     template_name = 'reservations/analytics.html'
-    context_object_name = 'hotels'
+    context_object_name = 'total_bookings'
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(AnalyticsView, self).get_context_data(**kwargs)
-        context['total_bookings'] = BookingModel.objects.filter(deleted=False).aggregate(Count('id'))
-        context['hotel_bookings_count'] = BookingModel.objects.all().values('room_id__hotel_id').annotate(
-            Count('id'))
-        context['user_hotels_rating'] = ReviewModel.objects.all().values('hotel_id').annotate(
-            avg_rating=Round(Avg('rating')))
+        context['hotel_bookings_count'] = BookingModel.objects.filter(deleted=False).values(
+            'room_id__hotel_id__name').annotate(bookings_per_hotel=Count('id')).order_by('-bookings_per_hotel')
+        context['user_hotels_rating'] = ReviewModel.objects.all().values('hotel_id__name').annotate(
+            avg_rating=Round(Avg('rating'))).order_by('-avg_rating')
         return context
 
     def get_queryset(self):
-        return HotelModel.objects.all()
+        return BookingModel.objects.filter(deleted=False).aggregate(Count('id'))
 
     def test_func(self):
         return self.request.user.is_superuser
