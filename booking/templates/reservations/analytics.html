@@ -7,50 +7,61 @@
 
 {% block css %}
     {{ block.super }}
-    <link rel="stylesheet" href="{% static 'css/bookings.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/analytics.css' %}" type="text/css">
 {% endblock css %}
 
 {% block content %}
+    <h2><label>Total count of bookings: </label>{{total_bookings.id__count}}</h2>
     <div class="bookings">
-        <h2><label>Total count of bookings: </label>{{total_bookings.id__count}}</h2>
-        {{user_hotels_rating}}
-        {{hotel_bookings_count}}
-
-        {% if hotels %}
-            {% for hotel in hotels%}
-                {% for hotel_count in hotel_bookings_count %}
-                    {% for key, value in hotel_count.items %}
-                        {% if key == "room_id__hotel_id" and value == hotel.id%}
-                        {% if key == "id__count" %}
-                        {{value}}
-                        {% endif %}
-                        <p>{{hotel.name}}</p>
-                    {% endif %}
+        <div class="top-rating">
+            <table class="table">
+                <h3>Top hotels by user rating</h3>
+                    <tr>
+                        <th>Hotel</th>
+                        <th>Rating</th>
+                    </tr>
+                    {% for hotel in user_hotels_rating %}
+                        {% for key, value in hotel.items %}
+                            <tr>
+                                <td>
+                                    {% if key == "hotel_id__name"%}
+                                        {{value}}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if key == "avg_rating"%}
+                                        {{value}}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
                     {% endfor %}
-                {% endfor %}
-            {% endfor %}
-        {% endif %}
-    </div>
-
-    {% for contact in page_obj %}
-        {{ contact.full_name|upper }}
-    {% endfor %}
-
-    <div class="pagination">
-        <span class="step-links">
-            {% if page_obj.has_previous %}
-                <a href="?page=1">&laquo; first</a>
-                <a href="?page={{ page_obj.previous_page_number }}">previous</a>
-            {% endif %}
-
-        <span class="current">
-            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-        </span>
-
-        {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}">next</a>
-            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
-        {% endif %}
-        </span>
+            </table>
+        </div>
+        <div class="top-booking">
+            <table class="table">
+                <h3>Top hotels by number of bookings</h3>
+                    <tr>
+                        <th>Hotel</th>
+                        <th>Bookings count</th>
+                    </tr>
+                    {% for hotel in hotel_bookings_count %}
+                        {% for key, value in hotel.items %}
+                    <tr>
+                        <td>
+                            {% if key == "room_id__hotel_id__name"%}
+                                {{value}}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if key == "bookings_per_hotel"%}
+                                {{value}}
+                            {% endif %}
+                        </td>
+                    </tr>
+                        {% endfor %}
+                    {% endfor %}
+            </table>
+        </div>
     </div>
 {% endblock %}
