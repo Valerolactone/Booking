@@ -1,14 +1,12 @@
 from datetime import datetime
-
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.mail import send_mail
 from django.db import transaction
-from django.db.models import Avg, Count, Prefetch
+from django.db.models import Avg, Count
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views import View
 from django.views.generic import ListView
-
 from .forms import UpdateReservationForm
 from .models import BookingModel, ReviewModel
 from hotels.models import PhotoModel, RoomModel, HotelModel
@@ -56,6 +54,7 @@ class BookingInfoView(LoginRequiredMixin, View):
                         fail_silently=False,
                     )
             return redirect('profile')
+        return redirect('booking_info', pk)
 
 
 class ListReviews(LoginRequiredMixin, UserPassesTestMixin, ListView):

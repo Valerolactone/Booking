@@ -36,12 +36,13 @@
             <form method="POST" class="reservation-form">
                 {% csrf_token %}
                 <h3>Update the reservation</h3>
-                <div class="form-error">{{update_reservation_form.non_field_errors}}</div>
-                <input type="hidden" name="room_id" id="id_room" value="{{booking.room_id.id}}">
-                <input type="hidden" name="cancelled" id="id_cancelled" value="False">
-                <p class="dates"><label class="form-label">Check-in: </label> {{ update_reservation_form.check_in_date }} </p>
-                <p class="dates"><label class="form-label">Check-out: </label> {{ update_reservation_form.check_out_date }} </p>
-                <div class="form-error">{{update_reservation_form.errors}}</div>
+                <span class="form-error">{{update_reservation_form.non_field_errors}}</span>
+                {% for field in update_reservation_form %}
+                    <p class="form-input"> <label class="form-label">{{field.label_tag}}</label>{{field}}</p>
+                        {% if field.errors %}
+                            <span class="form-error">{{field.errors}}</span>
+                        {% endif %}
+                {% endfor %}
                 <input type="submit" name='update-button' value="Update" class="button">
             </form>
             <button type="button" class="collapsible">View already booked dates</button>

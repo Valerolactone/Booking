@@ -1,25 +1,25 @@
 {% extends 'layout.html' %}
 {% load static %}
 
-{% block title %}Update room{% endblock title %}
+{% block title %}Update hotel{% endblock title %}
 
 {% block css %}
     {{ block.super }}
-    <link rel="stylesheet" href="{% static 'css/manage_hotel.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/update.css' %}" type="text/css">
 {% endblock css %}
 
-{% block header %}Update room info{% endblock %}
+{% block header %}Update info{% endblock %}
 
 {% block content %}
-<form method="POST" class="room-form" enctype="multipart/form-data">
+<form method="POST" class="hotel-form" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="wrapper">
         <div class="main-form">
-            <p class="form-error">{{form.non_form_errors}}</p>
+            <span class="form-error">{{form.non_field_errors}}</span>
             {% for field in form %}
-                <p class="form-input"> <label class="form-label">{{field.label_tag}}</label> {{field}}</p>
+                <div class="form-input"> <label class="form-label">{{field.label_tag}}</label> {{field}}</div>
                 {% if field.errors %}
-                    <p class="form-error">{{field.errors|striptags}}</p>
+                    <span class="form-error">{{field.errors|striptags}}</span>
                 {% endif %}
             {% endfor %}
         </div>
@@ -34,26 +34,21 @@
                 {% endfor %}
             </script>
             <div class="inline-forms">
-                <h3>Update room photos</h3>
-                {{ photo_formset.non_form_errors }}
+                <h3>Update photos</h3>
+                <span class="form-error">{{ photo_formset.non_form_errors }}</span>
                 {% for error in formset.non_form_errors %}
-                    <span style="color: red">{{ error }}</span>
+                    <span class="form-error">{{ error }}</span>
                 {% endfor %}
                 {% for form in formset %}
                     {{ form.management_form }}
                         <div class="inline-form">
                             {{ form.id }}
                             {% for field in form.visible_fields %}
-                                {{field}}
+                            <div class="form-input"> <label class="form-label">{{field.label_tag}}</label>{{field}}</div>
                                 {% for error in field.errors %}
-                                    <span style="color: red">{{ error }}</span>
+                                    <span class="form-error">{{ error }}</span>
                                 {% endfor %}
                             {% endfor %}
-                            {% if form.instance.pk %}
-                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#exampleModal{{form.instance.pk}}">
-                                Delete
-                            </button>
-                            {% endif %}
                         </div>
                 {% endfor %}
             </div>

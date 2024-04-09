@@ -21,7 +21,6 @@ class RegisterUserForm(UserCreationForm):
 class LoginUserForm(AuthenticationForm):
     username = forms.CharField(label='Login', widget=forms.TextInput(attrs={'class': 'form-input'}))
     password = forms.CharField(label='Password', widget=forms.PasswordInput(attrs={'class': 'form-input'}))
-    email = forms.EmailField(label='Email', widget=forms.EmailInput(attrs={'class': 'form-input'}))
 
 
 class UserForm(forms.ModelForm):
@@ -41,7 +40,7 @@ class BirthdayDateField(DateField):
 
 
 class ProfileForm(forms.ModelForm):
-    birth_date = BirthdayDateField()
+    birth_date = BirthdayDateField(required=False)
 
     class Meta:
         model = Profile

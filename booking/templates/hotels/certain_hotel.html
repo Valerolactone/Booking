@@ -76,11 +76,17 @@
         <form method="POST" class="review-form">
             <h3>Share your experiences with others</h3>
             {% csrf_token %}
-            <div class="form-error">{{form.non_field_errors}}</div>
+            <span class="form-error">{{comment_form.non_field_errors}}</span>
             <input type="hidden" name="hotel_id" id="id_hotel" value="{{hotel.id}}">
             <input type="hidden" name="user_id" id="id_user" value="{{request.user.id}}">
-            <p><label class="form-label">Rating</label>{{ comment_form.rating}}</p>
-            <p><label class="form-label">Comment</label>{{ comment_form.comment}}</p>
+            {% for field in comment_form %}
+                {% if not field.is_hidden %}
+                    <p class="form-input"> <label class="form-label">{{field.label_tag}}</label>{{field}}</p>
+                        {% if field.errors %}
+                            <span class="form-error">{{field.errors|striptags}}</span>
+                        {% endif %}
+                {% endif %}
+            {% endfor %}
             <input type="submit" value="Publish" class="button" name='comment-button'>
         </form>
         {% endif %}

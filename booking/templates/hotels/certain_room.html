@@ -41,14 +41,20 @@
                 {% csrf_token %}
                 <h3>Make a reservation</h3>
                 {% if request.user.is_authenticated %}
-                <div class="form-error">{{reservation_form.non_field_errors}}</div>
-                <input type="hidden" name="room_id" id="id_room" value="{{room.id}}">
-                <input type="hidden" name="user_id" id="id_user" value="{{request.user.id}}">
-                <input type="hidden" name="cancelled" id="id_cancelled" value="False">
-                <p class="dates"><label class="form-label">Check-in: </label> {{ reservation_form.check_in_date }} </p>
-                <p class="dates"><label class="form-label">Check-out: </label> {{ reservation_form.check_out_date }} </p>
-                <div class="form-error">{{reservation_form.errors}}</div>
-                <input type="submit" value="Reserve" class="button" name="reservation-button">
+                    <span class="form-error">{{reservation_form.non_field_errors}}</span>
+                    <div class="form-error">{{reservation_form.non_field_errors}}</div>
+                    <input type="hidden" name="room_id" id="id_room" value="{{room.id}}">
+                    <input type="hidden" name="user_id" id="id_user" value="{{request.user.id}}">
+                    <input type="hidden" name="cancelled" id="id_cancelled" value="False">
+                     {% for field in reservation_form %}
+                        {% if not field.is_hidden %}
+                            <p class="form-input"> <label class="form-label">{{field.label_tag}}</label>{{field}}</p>
+                                {% if field.errors %}
+                                    <span class="form-error">{{field.errors|striptags}}</span>
+                                {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                    <input type="submit" value="Reserve" class="button" name="reservation-button">
             </form>
                 {%else %}
                     <p class="warning">You must be logged in to make a reservation.</p>

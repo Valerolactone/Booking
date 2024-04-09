@@ -11,3 +11,7 @@
     display: inline-block;
     color: #3A5199;
 }
+
+.inline-form .form-label {
+    display: inline !important;
+}

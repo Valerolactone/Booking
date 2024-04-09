@@ -1,13 +1,11 @@
 from datetime import datetime
-
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.core.exceptions import ValidationError
 from django.db.models import Prefetch, Avg, Func
 from django.shortcuts import render, get_object_or_404, redirect
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 from django.views import View
 from django.views.generic import ListView, CreateView, UpdateView
-from django.db import transaction, DatabaseError
+from django.db import transaction
 from .models import HotelModel, RoomModel, PhotoModel
 from .forms import HotelForm, HotelPhotoFormSet, RoomForm, RoomPhotoFormSet
 from reservations.forms import CommentForm, ReservationForm
@@ -33,7 +31,7 @@ class ListHotelsView(ListView):
 
 class CreateHotelView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     form_class = HotelForm
-    template_name = 'hotels/new_hotel.html'
+    template_name = 'hotels/create_new_hotel_or_room.html'
 
     def get_context_data(self, **kwargs):
         context = super(CreateHotelView, self).get_context_data(**kwargs)
@@ -70,7 +68,7 @@ class CreateHotelView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
 class HotelInline:
     form_class = HotelForm
     model = HotelModel
-    template_name = 'hotels/update_hotel.html'
+    template_name = 'hotels/update_hotel_or_room.html'
 
     def form_valid(self, form):
         named_formsets = self.get_named_formsets()
@@ -114,7 +112,6 @@ class UpdateHotelView(LoginRequiredMixin, UserPassesTestMixin, HotelInline, Upda
 
 
 class HotelInfoView(View):
-
     def get(self, request, slug):
         hotel = get_object_or_404(HotelModel, slug=slug)
         photos = PhotoModel.objects.filter(hotel_id=hotel.id)
@@ -135,19 +132,20 @@ class HotelInfoView(View):
     def post(self, request, slug):
         hotel = get_object_or_404(HotelModel, slug=slug)
         comment_form = CommentForm(request.POST)
-        if request.POST.get('comment-button') and comment_form.is_valid():
-            comment_form.save()
-            return redirect('hotel_info', slug=slug)
         if request.POST.get('delete-button') and request.user.is_staff:
             hotel.deleted = True
             hotel.deleted_at = datetime.now()
             hotel.save()
             return redirect('hotels')
+        if request.POST.get('comment-button') and comment_form.is_valid():
+            comment_form.save()
+            return redirect('hotel_info', slug=slug)
+        return redirect('hotel_info', slug=slug)
 
 
 class CreateRoomView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     form_class = RoomForm
-    template_name = 'hotels/new_room.html'
+    template_name = 'hotels/create_new_hotel_or_room.html'
 
     def get_context_data(self, **kwargs):
         context = super(CreateRoomView, self).get_context_data(**kwargs)
@@ -184,7 +182,7 @@ class CreateRoomView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
 class RoomInline:
     form_class = RoomForm
     model = RoomModel
-    template_name = 'hotels/update_room.html'
+    template_name = 'hotels/update_hotel_or_room.html'
 
     def form_valid(self, form):
         named_formsets = self.get_named_formsets()
@@ -239,14 +237,9 @@ class RoomInfoView(View):
     def post(self, request, slug):
         room = get_object_or_404(RoomModel, slug=slug)
         reservation_form = ReservationForm(request.POST)
-        try:
-            with transaction.atomic():
-                if request.POST.get('reservation-button') and reservation_form.is_valid():
-                    reservation_form.save()
-        except DatabaseError:
-            print('db error')
-        except ValidationError:
-            print('validation error')
+        with transaction.atomic():
+            if request.POST.get('reservation-button') and reservation_form.is_valid():
+                reservation_form.save()
         if request.POST.get('delete-button') and request.user.is_staff:
             room.deleted = True
             room.deleted_at = datetime.now()

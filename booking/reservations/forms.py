@@ -52,13 +52,18 @@ class ReservationForm(forms.ModelForm):
 
         if check_in_date < datetime.now().date():
             raise ValidationError("You can't book past dates.")
-        elif check_in_date == check_out_date:
+
+        if check_in_date == check_out_date:
             raise ValidationError("The dates have to be different.")
+
+        if check_in_date > check_out_date:
+            raise ValidationError("The booking check-out date cannot be earlier than the booking check-in date.")
 
         return cleaned_data
 
     def save(self):
         instance = super(ReservationForm, self).save()
+
         @transaction.on_commit
         def send_booking_confirmation_email():
             send_mail(
@@ -92,8 +97,12 @@ class UpdateReservationForm(forms.ModelForm):
 
         if new_check_in_date < datetime.now().date():
             raise ValidationError("You can't book past dates.")
-        elif new_check_in_date == new_check_out_date:
+
+        if new_check_in_date == new_check_out_date:
             raise ValidationError("The dates have to be different.")
+
+        if new_check_in_date > new_check_out_date:
+            raise ValidationError("The booking check-out date cannot be earlier than the booking check-in date.")
 
         for date in old_booking_period:
             if date in unavailable_dates:

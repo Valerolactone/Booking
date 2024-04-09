@@ -110,23 +110,6 @@ h1 {
     cursive;
     }
 
-.form-input {
-    font-size: 16px;
-}
-
-.form-label {
-    min-width: 100px;
-    vertical-align: top;
-    font-weight: bolder;
-    color: #3A5199;
-}
-
-.form-error ul {
-    list-style: none;
-    padding: 0;
-    color: #CC0000;
-}
-
 .button {
   align-items: center;
   background-color: #3A5199;
@@ -184,3 +167,25 @@ li {
     display: inline-block;
     color: black;
 }
+
+.form-input {
+    font-size: 16px;
+
+}
+
+.form-label {
+    display: flex;
+    font-weight: bolder;
+    color: #3A5199;
+}
+
+.form-error {
+    color: #CC0000;
+    font-weight: bold;
+}
+
+
+#site_name a {
+    text-decoration: none;
+    display: inline-block;
+    }
