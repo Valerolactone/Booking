@@ -76,10 +76,10 @@
         <form method="POST" class="review-form">
             <h3>Share your experiences with others</h3>
             {% csrf_token %}
-            <span class="form-error">{{comment_form.non_field_errors}}</span>
+            <span class="form-error">{{form.non_field_errors}}</span>
             <input type="hidden" name="hotel_id" id="id_hotel" value="{{hotel.id}}">
             <input type="hidden" name="user_id" id="id_user" value="{{request.user.id}}">
-            {% for field in comment_form %}
+            {% for field in form %}
                 {% if not field.is_hidden %}
                     <p class="form-input"> <label class="form-label">{{field.label_tag}}</label>{{field}}</p>
                         {% if field.errors %}

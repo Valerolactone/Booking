@@ -44,8 +44,9 @@ img {
     background-color: #777;
     color: white;
     cursor: pointer;
-    padding: 18px;
-    width: 230px;
+    width: 15em;
+    margin: 10px;
+    padding: 10px;
     border: none;
     text-align: center;
     outline: none;

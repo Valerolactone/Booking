@@ -1,14 +1,14 @@
 {% extends 'layout.html' %}
 {% load static %}
 
-{% block title %}Update hotel{% endblock title %}
+{% block title %}New hotel{% endblock title %}
 
 {% block css %}
     {{ block.super }}
-    <link rel="stylesheet" href="{% static 'css/update.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/new.css' %}" type="text/css">
 {% endblock css %}
 
-{% block header %}Update info{% endblock %}
+{% block header %}Fill out the form{% endblock %}
 
 {% block content %}
 <form method="POST" class="hotel-form" enctype="multipart/form-data">
@@ -34,7 +34,7 @@
                 {% endfor %}
             </script>
             <div class="inline-forms">
-                <h3>Update photos</h3>
+                <h3>Photos</h3>
                 <span class="form-error">{{ photo_formset.non_form_errors }}</span>
                 {% for error in formset.non_form_errors %}
                     <span class="form-error">{{ error }}</span>
@@ -52,11 +52,11 @@
                         </div>
                 {% endfor %}
             </div>
-        {% endwith %}
+         {% endwith %}
     </div>
     <div class="form-buttons">
-        <input type="submit" value="Update" class="button">
-        <a href="{%url 'hotels' %}" class="button">Cancel</a>
+        <input type="submit" value="Save" class="button">
+        <a href="{%url 'hotels'%}" class="button">Cancel</a>
     </div>
 </form>
 {% endblock %}

@@ -36,27 +36,27 @@
             <form method="POST" class="reservation-form">
                 {% csrf_token %}
                 <h3>Update the reservation</h3>
-                <span class="form-error">{{update_reservation_form.non_field_errors}}</span>
-                {% for field in update_reservation_form %}
+                    <span class="form-error">{{form.non_field_errors}}</span>
+                {% for field in form %}
                     <p class="form-input"> <label class="form-label">{{field.label_tag}}</label>{{field}}</p>
                         {% if field.errors %}
                             <span class="form-error">{{field.errors}}</span>
                         {% endif %}
                 {% endfor %}
                 <input type="submit" name='update-button' value="Update" class="button">
-            </form>
-            <button type="button" class="collapsible">View already booked dates</button>
-            <div class="unavailable-dates">
-            {% if unavailable_dates %}
-                <div class="booked_dates">
-                    {% for date in unavailable_dates %}
-                    <span>{{date}}</span>
-                    {%endfor%}
+                <button type="button" class="collapsible">View already booked dates</button>
+                <div class="unavailable-dates">
+                {% if unavailable_dates %}
+                    <div class="booked_dates">
+                        {% for date in unavailable_dates %}
+                        <span>{{date}}</span>
+                        {%endfor%}
+                    </div>
+                {% else %}
+                    <p> All dates are available for booking. </p>
+                {% endif %}
                 </div>
-            {% else %}
-                <p> All dates are available for booking. </p>
-            {% endif %}
-            </div>
+            </form>
         </div>
         <div class="delete_reservation">
             <form method="POST" class="reservation-form">

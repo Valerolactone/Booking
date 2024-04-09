@@ -1,9 +1,7 @@
 from datetime import datetime
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Prefetch, Avg, Func
-from django.shortcuts import render, get_object_or_404, redirect
-from django.urls import reverse
-from django.views import View
+from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import ListView, CreateView, UpdateView
 from django.db import transaction
 from .models import HotelModel, RoomModel, PhotoModel
@@ -29,46 +27,10 @@ class ListHotelsView(ListView):
             Prefetch('photos', queryset=PhotoModel.objects.filter(photo_name='cover'))).order_by('-created_at')
 
 
-class CreateHotelView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
-    form_class = HotelForm
-    template_name = 'hotels/create_new_hotel_or_room.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(CreateHotelView, self).get_context_data(**kwargs)
-        context['photo_formset'] = HotelPhotoFormSet()
-        return context
-
-    def post(self, request, *args, **kwargs):
-        self.object = None
-        form_class = self.get_form_class()
-        form = self.get_form(form_class)
-        photo_formset = HotelPhotoFormSet(self.request.POST, self.request.FILES)
-        if form.is_valid() and photo_formset.is_valid():
-            return self.form_valid(form, photo_formset)
-        else:
-            return self.form_invalid(form, photo_formset)
-
-    def form_valid(self, form, photo_formset):
-        self.object = form.save(commit=False)
-        self.object.save()
-        photos = photo_formset.save(commit=False)
-        for photo in photos:
-            photo.hotel_id = self.object
-            photo.save()
-        return redirect(reverse('hotels'))
-
-    def form_invalid(self, form, photo_formset):
-        return self.render_to_response(
-            self.get_context_data(form=form, photo_formset=photo_formset))
-
-    def test_func(self):
-        return self.request.user.is_superuser
-
-
 class HotelInline:
     form_class = HotelForm
     model = HotelModel
-    template_name = 'hotels/update_hotel_or_room.html'
+    template_name = 'hotels/create_or_update_hotel_or_room.html'
 
     def form_valid(self, form):
         named_formsets = self.get_named_formsets()
@@ -94,6 +56,23 @@ class HotelInline:
             photo.save()
 
 
+class CreateHotelView(LoginRequiredMixin, UserPassesTestMixin, HotelInline, CreateView):
+
+    def get_context_data(self, **kwargs):
+        context = super(CreateHotelView, self).get_context_data(**kwargs)
+        context['named_formsets'] = self.get_named_formsets()
+        return context
+
+    def get_named_formsets(self):
+        if self.request.method == "GET":
+            return {'photos': HotelPhotoFormSet()}
+        else:
+            return {'photos': HotelPhotoFormSet(self.request.POST or None, self.request.FILES or None)}
+
+    def test_func(self):
+        return self.request.user.is_superuser
+
+
 class UpdateHotelView(LoginRequiredMixin, UserPassesTestMixin, HotelInline, UpdateView):
 
     def get_context_data(self, **kwargs):
@@ -102,87 +81,63 @@ class UpdateHotelView(LoginRequiredMixin, UserPassesTestMixin, HotelInline, Upda
         return context
 
     def get_named_formsets(self):
-        return {
-            'photos': HotelPhotoFormSet(self.request.POST or None, self.request.FILES or None,
-                                        instance=self.object, prefix='photos'),
-        }
+        return {'photos': HotelPhotoFormSet(self.request.POST or None, self.request.FILES or None,
+                                            instance=self.object, prefix='photos')}
 
     def test_func(self):
         return self.request.user.is_superuser
 
 
-class HotelInfoView(View):
-    def get(self, request, slug):
-        hotel = get_object_or_404(HotelModel, slug=slug)
-        photos = PhotoModel.objects.filter(hotel_id=hotel.id)
+class HotelInfoView(CreateView):
+    model = ReviewModel
+    form_class = CommentForm
+    template_name = 'hotels/certain_hotel.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(HotelInfoView, self).get_context_data(**kwargs)
+        hotel = get_object_or_404(HotelModel, slug=self.kwargs.get('slug'))
         rooms = RoomModel.objects.filter(hotel_id=hotel.id)
         reviews = ReviewModel.objects.filter(hotel_id=hotel.id).order_by('-created_at')
         current_date = datetime.now().date()
         bookings = BookingModel.objects.filter(room_id__in=rooms.values_list('id', flat=True))
-        users_who_booked = bookings.distinct('user_id').values_list('user_id', flat=True)
-        check_out_dates = bookings.filter(check_out_date__lte=current_date).values_list('check_out_date', flat=True)
-        user_hotel_rating = reviews.aggregate(avg_rating=Round(Avg('rating')))
-        comment_form = CommentForm()
-        return render(request, 'hotels/certain_hotel.html',
-                      context={'hotel': hotel, 'photos': photos, 'rooms': rooms, 'reviews': reviews,
-                               'bookings': bookings, 'comment_form': comment_form,
-                               'user_hotel_rating': user_hotel_rating, 'users_who_booked': users_who_booked,
-                               'check_out_dates': check_out_dates})
+        context['hotel'] = hotel
+        context['rooms'] = rooms
+        context['reviews'] = reviews
+        context['current_date'] = current_date
+        context['bookings'] = bookings
+        context['photos'] = PhotoModel.objects.filter(hotel_id=hotel.id)
+        context['users_who_booked'] = bookings.distinct('user_id').values_list('user_id', flat=True)
+        context['check_out_dates'] = bookings.filter(check_out_date__lte=current_date).values_list('check_out_date',
+                                                                                                   flat=True)
+        context['user_hotel_rating'] = reviews.aggregate(avg_rating=Round(Avg('rating')))
 
-    def post(self, request, slug):
-        hotel = get_object_or_404(HotelModel, slug=slug)
-        comment_form = CommentForm(request.POST)
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
         if request.POST.get('delete-button') and request.user.is_staff:
+            hotel = get_object_or_404(HotelModel, slug=self.kwargs.get('slug'))
             hotel.deleted = True
             hotel.deleted_at = datetime.now()
             hotel.save()
             return redirect('hotels')
-        if request.POST.get('comment-button') and comment_form.is_valid():
-            comment_form.save()
-            return redirect('hotel_info', slug=slug)
-        return redirect('hotel_info', slug=slug)
-
-
-class CreateRoomView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
-    form_class = RoomForm
-    template_name = 'hotels/create_new_hotel_or_room.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(CreateRoomView, self).get_context_data(**kwargs)
-        context['photo_formset'] = RoomPhotoFormSet()
-        return context
-
-    def post(self, request, *args, **kwargs):
-        self.object = None
-        form_class = self.get_form_class()
-        form = self.get_form(form_class)
-        photo_formset = HotelPhotoFormSet(self.request.POST, self.request.FILES)
-        if form.is_valid() and photo_formset.is_valid():
-            return self.form_valid(form, photo_formset)
+        if request.POST.get('comment-button') and form.is_valid():
+            form.save()
+            return redirect('hotel_info', slug=self.kwargs.get('slug'))
         else:
-            return self.form_invalid(form, photo_formset)
+            return self.form_invalid(form, **kwargs)
 
-    def form_valid(self, form, photo_formset):
-        self.object = form.save(commit=False)
-        self.object.save()
-        photos = photo_formset.save(commit=False)
-        for photo in photos:
-            photo.room_id = self.object
-            photo.save()
-        return redirect('hotel_info', slug=self.object.hotel_id.slug)
-
-    def form_invalid(self, form, photo_formset):
+    def form_invalid(self, form, **kwargs):
+        self.object = None
         return self.render_to_response(
-            self.get_context_data(form=form, photo_formset=photo_formset))
-
-    def test_func(self):
-        return self.request.user.is_superuser
+            self.get_context_data(form=form, **kwargs))
 
 
 class RoomInline:
     form_class = RoomForm
     model = RoomModel
-    template_name = 'hotels/update_hotel_or_room.html'
+    template_name = 'hotels/create_or_update_hotel_or_room.html'
 
     def form_valid(self, form):
         named_formsets = self.get_named_formsets()
@@ -208,6 +163,23 @@ class RoomInline:
             photo.save()
 
 
+class CreateRoomView(LoginRequiredMixin, UserPassesTestMixin, RoomInline, CreateView):
+
+    def get_context_data(self, **kwargs):
+        context = super(CreateRoomView, self).get_context_data(**kwargs)
+        context['named_formsets'] = self.get_named_formsets()
+        return context
+
+    def get_named_formsets(self):
+        if self.request.method == "GET":
+            return {'photos': HotelPhotoFormSet()}
+        else:
+            return {'photos': HotelPhotoFormSet(self.request.POST or None, self.request.FILES or None)}
+
+    def test_func(self):
+        return self.request.user.is_superuser
+
+
 class UpdateRoomView(LoginRequiredMixin, UserPassesTestMixin, RoomInline, UpdateView):
 
     def get_context_data(self, **kwargs):
@@ -216,35 +188,44 @@ class UpdateRoomView(LoginRequiredMixin, UserPassesTestMixin, RoomInline, Update
         return ctx
 
     def get_named_formsets(self):
-        return {
-            'photos': RoomPhotoFormSet(self.request.POST or None, self.request.FILES or None, instance=self.object)}
+        return {'photos': RoomPhotoFormSet(self.request.POST or None, self.request.FILES or None, instance=self.object)}
 
     def test_func(self):
         return self.request.user.is_superuser
 
 
-class RoomInfoView(View):
-    def get(self, request, slug):
-        room = get_object_or_404(RoomModel, slug=slug)
-        photos = PhotoModel.objects.filter(room_id=room.id)
-        reservation_form = ReservationForm()
-        unavailable_dates = get_unavailable_dates(room.id)
+class RoomInfoView(CreateView):
+    model = BookingModel
+    form_class = ReservationForm
+    template_name = 'hotels/certain_room.html'
 
-        return render(request, 'hotels/certain_room.html',
-                      context={'room': room, 'photos': photos, 'reservation_form': reservation_form,
-                               'unavailable_dates': unavailable_dates})
+    def get_context_data(self, **kwargs):
+        context = super(RoomInfoView, self).get_context_data(**kwargs)
+        room = get_object_or_404(RoomModel, slug=self.kwargs.get('slug'))
+        context['room'] = room
+        context['unavailable_dates'] = get_unavailable_dates(room.id)
+        context['photos'] = PhotoModel.objects.filter(room_id=room.id)
 
-    def post(self, request, slug):
-        room = get_object_or_404(RoomModel, slug=slug)
-        reservation_form = ReservationForm(request.POST)
-        with transaction.atomic():
-            if request.POST.get('reservation-button') and reservation_form.is_valid():
-                reservation_form.save()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
         if request.POST.get('delete-button') and request.user.is_staff:
+            room = get_object_or_404(RoomModel, slug=self.kwargs.get('slug'))
             room.deleted = True
             room.deleted_at = datetime.now()
             room.available = False
             room.save()
-            return redirect('hotels')
+            return redirect('hotel_info', slug=room.hotel_id.slug)
+        if request.POST.get('reservation-button') and form.is_valid():
+            with transaction.atomic():
+                form.save()
+                return redirect('profile')
+        else:
+            return self.form_invalid(form, **kwargs)
 
-        return redirect('room_info', slug=slug)
+    def form_invalid(self, form, **kwargs):
+        self.object = None
+        return self.render_to_response(
+            self.get_context_data(form=form, **kwargs))

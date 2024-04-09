@@ -49,6 +49,8 @@ class ReservationForm(forms.ModelForm):
         cleaned_data = super().clean()
         check_in_date = cleaned_data.get('check_in_date')
         check_out_date = cleaned_data.get('check_out_date')
+        room_id = cleaned_data.get('room_id')
+        unavailable_dates = get_unavailable_dates(room_id)
 
         if check_in_date < datetime.now().date():
             raise ValidationError("You can't book past dates.")
@@ -58,6 +60,11 @@ class ReservationForm(forms.ModelForm):
 
         if check_in_date > check_out_date:
             raise ValidationError("The booking check-out date cannot be earlier than the booking check-in date.")
+
+        while check_in_date <= check_out_date:
+            if check_in_date in unavailable_dates:
+                raise ValidationError("Those dates are already booked.")
+            check_in_date += timedelta(days=1)
 
         return cleaned_data
 

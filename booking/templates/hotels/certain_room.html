@@ -41,12 +41,12 @@
                 {% csrf_token %}
                 <h3>Make a reservation</h3>
                 {% if request.user.is_authenticated %}
-                    <span class="form-error">{{reservation_form.non_field_errors}}</span>
-                    <div class="form-error">{{reservation_form.non_field_errors}}</div>
+                    <span class="form-error">{{form.non_form_errors}}</span>
+                    <div class="form-error">{{form.non_field_errors}}</div>
                     <input type="hidden" name="room_id" id="id_room" value="{{room.id}}">
                     <input type="hidden" name="user_id" id="id_user" value="{{request.user.id}}">
                     <input type="hidden" name="cancelled" id="id_cancelled" value="False">
-                     {% for field in reservation_form %}
+                     {% for field in form %}
                         {% if not field.is_hidden %}
                             <p class="form-input"> <label class="form-label">{{field.label_tag}}</label>{{field}}</p>
                                 {% if field.errors %}
@@ -55,20 +55,20 @@
                         {% endif %}
                     {% endfor %}
                     <input type="submit" value="Reserve" class="button" name="reservation-button">
-            </form>
                 {%else %}
                     <p class="warning">You must be logged in to make a reservation.</p>
                 {% endif %}
-            <button type="button" class="collapsible">View already booked dates</button>
-            <div class="unavailable-dates">
-            {% if unavailable_dates %}
-                <div class="booked_dates">
-                    {% for date in unavailable_dates %}
-                    <span>{{date}}</span>
-                    {%endfor%}
+                <button type="button" class="collapsible">View already booked dates</button>
+                <div class="unavailable-dates">
+                {% if unavailable_dates %}
+                    <div class="booked_dates">
+                        {% for date in unavailable_dates %}
+                        <span>{{date}}</span>
+                        {%endfor%}
+                    </div>
+                {% endif %}
                 </div>
-            {% endif %}
-            </div>
+            </form>
         </div>
     {% endif %}
 <script>
