@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import ListView, UpdateView
 from .forms import UpdateReservationForm
 from .models import BookingModel, ReviewModel
-from hotels.models import PhotoModel, RoomModel, HotelModel
+from hotels.models import PhotoModel, RoomModel, HotelModel, HotelStatisticsModel
 from .services import get_unavailable_dates
 from hotels.views import Round
 
@@ -26,7 +26,7 @@ class BookingInfoView(LoginRequiredMixin, UpdateView):
         context['booking'] = self.object
         context['current_date'] = datetime.now().date()
         context['price'] = (
-                                       self.object.check_out_date - self.object.check_in_date).days * self.object.room_id.price_per_night
+                                   self.object.check_out_date - self.object.check_in_date).days * self.object.room_id.price_per_night
         context['unavailable_dates'] = get_unavailable_dates(self.object.room_id)
         context['photos'] = PhotoModel.objects.filter(room_id=self.object.room_id)
 
@@ -107,10 +107,8 @@ class AnalyticsView(LoginRequiredMixin, UserPassesTestMixin, ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(AnalyticsView, self).get_context_data(**kwargs)
-        context['hotel_bookings_count'] = BookingModel.objects.filter(deleted=False).values(
-            'room_id__hotel_id__name').annotate(bookings_per_hotel=Count('id')).order_by('-bookings_per_hotel')
-        context['user_hotels_rating'] = ReviewModel.objects.all().values('hotel_id__name').annotate(
-            avg_rating=Round(Avg('rating'))).order_by('-avg_rating')
+        context['rating_statistics'] = HotelStatisticsModel.objects.all().order_by('-user_rating')
+        context['booking_statistics'] = HotelStatisticsModel.objects.all().order_by('-total_number_of_bookings')
         return context
 
     def get_queryset(self):

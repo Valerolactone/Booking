@@ -4,7 +4,7 @@ from django.db.models import Prefetch, Avg, Func
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import ListView, CreateView, UpdateView
 from django.db import transaction
-from .models import HotelModel, RoomModel, PhotoModel
+from .models import HotelModel, RoomModel, PhotoModel, HotelStatisticsModel
 from .forms import HotelForm, HotelPhotoFormSet, RoomForm, RoomPhotoFormSet
 from reservations.forms import CommentForm, ReservationForm
 from reservations.models import ReviewModel, BookingModel, DateRange
@@ -100,16 +100,16 @@ class HotelInfoView(CreateView):
         reviews = ReviewModel.objects.filter(hotel_id=hotel.id).order_by('-created_at')
         current_date = datetime.now().date()
         bookings = BookingModel.objects.filter(room_id__in=rooms.values_list('id', flat=True))
+        statistics = HotelStatisticsModel.objects.get(hotel=hotel.id)
         context['hotel'] = hotel
         context['rooms'] = rooms
         context['reviews'] = reviews
         context['current_date'] = current_date
-        context['bookings'] = bookings
         context['photos'] = PhotoModel.objects.filter(hotel_id=hotel.id)
         context['users_who_booked'] = bookings.distinct('user_id').values_list('user_id', flat=True)
         context['check_out_dates'] = bookings.filter(check_out_date__lte=current_date).values_list('check_out_date',
                                                                                                    flat=True)
-        context['user_hotel_rating'] = reviews.aggregate(avg_rating=Round(Avg('rating')))
+        context['statistics'] = statistics
 
         return context
 

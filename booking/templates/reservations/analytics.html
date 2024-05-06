@@ -9,7 +9,6 @@
     {{ block.super }}
     <link rel="stylesheet" href="{% static 'css/analytics.css' %}" type="text/css">
 {% endblock css %}
-
 {% block content %}
     <h2><label>Total count of bookings: </label>{{total_bookings.id__count}}</h2>
     <div class="bookings">
@@ -20,13 +19,18 @@
                         <th>Hotel</th>
                         <th>Rating</th>
                     </tr>
-                    {% for hotel in user_hotels_rating %}
+                    {% for hotel_stat in rating_statistics %}
                     <tr>
-                        {% for value in hotel.values %}
-                            <td>
-                                {{value}}
-                            </td>
-                        {% endfor %}
+                        <td>
+                            {{hotel_stat.hotel.name}}
+                        </td>
+                        <td>
+                            {% if hotel_stat.user_rating == 0 and hotel_stat.total_number_of_reviews == 0%}
+                                No reviews yet
+                            {% else %}
+                                {{hotel_stat.user_rating}}
+                            {% endif %}
+                        </td>
                     </tr>
                     {% endfor %}
             </table>
@@ -38,13 +42,18 @@
                         <th>Hotel</th>
                         <th>Bookings count</th>
                     </tr>
-                    {% for hotel in hotel_bookings_count %}
+                    {% for hotel_stat in booking_statistics %}
                     <tr>
-                        {% for value in hotel.values %}
                         <td>
-                            {{value}}
+                            {{hotel_stat.hotel.name}}
                         </td>
-                        {% endfor %}
+                        <td>
+                            {% if hotel_stat.total_number_of_bookings == 0%}
+                                No bookings yet
+                            {% else %}
+                                {{hotel_stat.total_number_of_bookings}}
+                            {% endif %}
+                        </td>
                     </tr>
                     {% endfor %}
             </table>

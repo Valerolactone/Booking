@@ -24,8 +24,8 @@
     </div>
     <div class="info">
         <p class="user-rating">
-            {% if user_hotel_rating.avg_rating is not None %}
-                Hotel rating is {{user_hotel_rating.avg_rating}} based on {{reviews|length}} review(s).
+            {% if statistics.user_rating is not 0 %}
+                Hotel rating is {{statistics.user_rating}} based on {{statistics.total_number_of_reviews}} review(s).
             {% else %}
                 This hotel does not yet have a user rating.
             {% endif %}

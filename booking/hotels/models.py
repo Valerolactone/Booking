@@ -68,3 +68,9 @@ class PhotoModel(models.Model):
             return super(PhotoModel, self).clean()
         return super(PhotoModel, self).save(*args, **kwargs)
 
+
+class HotelStatisticsModel(models.Model):
+    hotel = models.ForeignKey(HotelModel, on_delete=models.CASCADE)
+    total_number_of_bookings = models.IntegerField(default=0)
+    total_number_of_reviews = models.IntegerField(default=0)
+    user_rating = models.FloatField(default=0)
