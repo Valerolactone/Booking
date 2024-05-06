@@ -26,6 +26,7 @@
                 <p class="user-info"><label class="user-label"> Birthday: </label> {{user.profile.birth_date}} </p>
             {% endif %}
         </div>
+        {% if not user.profile.birth_date or not user.first_name or not user.last_name %}
         <div class="update">
             <button type="button" class="collapsible">Update Profile</button>
             <div class="update-profile">
@@ -33,10 +34,14 @@
                 <div class="user-update">
                     {% csrf_token %}
                     <div class="form-error">{{user_form.non_field_errors}}</div>
-                    <div class="form-input"><label class="form-label">Username: </label>{{ user_form.username }}</div>
-                    <div class="form-input"><label class="form-label">Email: </label>{{ user_form.email }}</div>
-                    <div class="form-input"><label class="form-label">First name: </label>{{ user_form.first_name }}</div>
-                    <div class="form-input"><label class="form-label">Last name: </label>{{ user_form.last_name }}</div>
+                    {% if not user.first_name %}
+                        <p class="warning">The first name cannot be changed once set.</p>
+                        <div class="form-input"><label class="form-label">First name: </label>{{ user_form.first_name }}</div>
+                    {% endif %}
+                    {% if not user.last_name %}
+                        <p class="warning">The last name cannot be changed once set.</p>
+                        <div class="form-input"><label class="form-label">Last name: </label>{{ user_form.last_name }}</div>
+                    {% endif %}
                     {% if not user.profile.birth_date %}
                         <p class="warning">The date of birth cannot be changed once set.</p>
                         <div class="form-input"><label class="form-label">Birthday: </label>{{ profile_form.birth_date }}</div>
@@ -45,6 +50,7 @@
                 <input type="submit" value="Update" class="button">
             </form>
         </div>
+        {% endif %}
     </div>
 </div>
     <div class="reservations">

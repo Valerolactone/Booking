@@ -42,10 +42,7 @@ class ProfileView(LoginRequiredMixin, View):
         current_date = datetime.now().date()
         user = get_object_or_404(User, pk=request.user.id)
         profile_form = ProfileForm()
-        user_form = UserForm(initial={'username': user.username,
-                                      'first_name': user.first_name,
-                                      'last_name': user.last_name,
-                                      'email': user.email})
+        user_form = UserForm()
         bookings = BookingModel.objects.filter(user_id=user.id).order_by('-check_out_date')
         future_bookings = bookings.filter(check_in_date__gt=current_date, deleted=False)
         current_bookings = bookings.filter(check_in_date__lte=current_date, check_out_date__gte=current_date,
